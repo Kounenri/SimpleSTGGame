@@ -3,17 +3,20 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - KeyManager
+  - CinemachineTarget
+  - Enemy
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Terrain
   - Water
   - UI
   - BlockUI
   - GlobalCanvas
-  - 
+  - Particle
   - ClickMask
   - 
   - 
@@ -52,4 +55,7 @@ TagManager:
     locked: 0
   - name: GlobalCanvas
     uniqueID: 38788127
+    locked: 0
+  - name: Particle
+    uniqueID: 3980683277
     locked: 0

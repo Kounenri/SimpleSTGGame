@@ -3,9 +3,10 @@
 --- !u!1 &194048
 GameObject:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 494048}
   - component: {fileID: 11494048}
@@ -20,29 +21,44 @@ GameObject:
   m_IsActive: 1
 --- !u!4 &494048
 Transform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 194048}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 20, y: -2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!81 &8183756
-AudioListener:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+--- !u!114 &11494048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 194048}
   m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb3ca1d81edbf054cb59e92d225e865e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MainGame: {fileID: 0}
+  m_CloseBtnSound: {fileID: 8300000, guid: 3a80c871d0e6cb343928c62c9b7745fb, type: 3}
+  m_UiOpenSound: {fileID: 8300000, guid: ab4a01c88efd5df4e89bb654427b6d58, type: 3}
+  m_UiOpenPopupSound: {fileID: 0}
+  m_ClosePopupBtnSound: {fileID: 0}
+  m_BeAttack_Voice: {fileID: 8300000, guid: 61bf9444ba996254db16e2fdfab06a00, type: 3}
+  m_AudioSource: {fileID: 0}
 --- !u!82 &8283756
 AudioSource:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 194048}
   m_Enabled: 1
   serializedVersion: 4
@@ -67,239 +83,77 @@ AudioSource:
   rolloffCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - serializedVersion: 2
+    - serializedVersion: 3
       time: 0
       value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
-    - serializedVersion: 2
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
       time: 1
       value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
   panLevelCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - serializedVersion: 2
+    - serializedVersion: 3
       time: 0
       value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 0
+    m_RotationOrder: 4
   spreadCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - serializedVersion: 2
+    - serializedVersion: 3
       time: 0
       value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 0
+    m_RotationOrder: 4
   reverbZoneMixCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - serializedVersion: 2
+    - serializedVersion: 3
       time: 0
       value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 0
---- !u!114 &11494048
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+    m_RotationOrder: 4
+--- !u!81 &8183756
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 194048}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb3ca1d81edbf054cb59e92d225e865e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Login: {fileID: 8300000, guid: ad23d20c617d727409bd10649f85500f, type: 3}
-  m_CloseBtnSound: {fileID: 8300000, guid: 3a80c871d0e6cb343928c62c9b7745fb, type: 3}
-  m_UiOpenSound: {fileID: 8300000, guid: ab4a01c88efd5df4e89bb654427b6d58, type: 3}
-  m_ShipArrival: {fileID: 8300000, guid: 44e3cff79439f1d4c86ea727b97d90f2, type: 3}
-  m_ShipDeparture: {fileID: 8300000, guid: 36e964a05219fb148aaf9dfd6a838b65, type: 3}
-  m_ShowAlertSound: {fileID: 8300000, guid: 305de64bfcf00754293628d62dcf08f8, type: 3}
-  m_SliderChange: {fileID: 8300000, guid: 4b249af80c2dd41449054d29cc49e364, type: 3}
-  m_UseItemSound: {fileID: 8300000, guid: cd1c8e15366038f40a4b1d44f4ecd130, type: 3}
-  m_BuyAndUseItemSound: {fileID: 8300000, guid: e62a1badd01c72d4da0ebac8f3645d35,
-    type: 3}
-  m_SlideChooseSound: {fileID: 8300000, guid: 42c5c614e92979546ae7bce817c3b6b5, type: 3}
-  m_ProgressCompleteSound: {fileID: 8300000, guid: cb2618a587a765c4d8d3005e5f6b7091,
-    type: 3}
-  m_loading_screen_in: {fileID: 8300000, guid: c34bfc4bf58f915429d142b9b3a48546, type: 3}
-  m_loading_screen_out: {fileID: 8300000, guid: d38fdc8c3c240ef49b3b5b9c840262a0,
-    type: 3}
-  m_Menu_in: {fileID: 8300000, guid: ab4a01c88efd5df4e89bb654427b6d58, type: 3}
-  m_Menu_out: {fileID: 8300000, guid: 3a80c871d0e6cb343928c62c9b7745fb, type: 3}
-  m_Side_Menu_in: {fileID: 8300000, guid: 2bb6088d2b648b24a87c99bc23f8227c, type: 3}
-  m_Side_Menu_out: {fileID: 8300000, guid: 5838750a7da22784e8d4285e2262a253, type: 3}
-  m_bottom_right_menu: {fileID: 8300000, guid: 509e18293c272dc4fb21cc5a79568420, type: 3}
-  m_TabClickSound: {fileID: 8300000, guid: 305de64bfcf00754293628d62dcf08f8, type: 3}
-  m_BtnClickSound: {fileID: 8300000, guid: 72f73bee5258a8e48a1830657a909f4e, type: 3}
-  m_PurchaseSuccessSound: {fileID: 8300000, guid: 3ead0247769cb40499c6cdc16f193f25,
-    type: 3}
-  m_shop_enter: {fileID: 8300000, guid: c4814dec9c6edea469bfa4fa4d709dea, type: 3}
-  m_new_message: {fileID: 8300000, guid: cf9632f030f8396459fde30b3c31cc9d, type: 3}
-  m_delete_message: {fileID: 8300000, guid: 8473754e6a40941419282e74da9c028e, type: 3}
-  m_daily_task_Complete: {fileID: 8300000, guid: 911cefe7b3a0e33428fc6c61f074a6fd,
-    type: 3}
-  m_BuildingComplete: {fileID: 8300000, guid: cb2618a587a765c4d8d3005e5f6b7091, type: 3}
-  m_galaxy_menu_in: {fileID: 8300000, guid: 528cee2713ad7a34f92a8b8f3be75e1d, type: 3}
-  m_galaxy_zoom_in: {fileID: 8300000, guid: d5f39ce54acb6a24cb86a312243acc2b, type: 3}
-  m_galaxy_zoom_out: {fileID: 8300000, guid: a48543bc66e13274aa33c52e360502e9, type: 3}
-  m_station_zoom_in: {fileID: 8300000, guid: 4cdcb2b2398980c4081ec3109360bdc2, type: 3}
-  m_station_zoom_out: {fileID: 8300000, guid: d51042ba1f72f704e9d4939c38e5cc64, type: 3}
-  m_station_swipe: {fileID: 8300000, guid: 76b22a48824e58143be1f84a7e827d68, type: 3}
-  m_In_building_details: {fileID: 8300000, guid: 565d1e391a2f2b748a9d8c543d9126ca,
-    type: 3}
-  m_construction_button: {fileID: 8300000, guid: cdd2e100f07eb5743b7f991d4de4a2b8,
-    type: 3}
-  m_station_jump: {fileID: 8300000, guid: 020836541a2a07e4e97da0f4da0acf48, type: 3}
-  m_ship_jump: {fileID: 8300000, guid: 98e04a6e704ab784c9b0fd404d3409eb, type: 3}
-  m_Star_Cloud_change_View: {fileID: 8300000, guid: 9d3b60a09494b674a9705bfd2c61d4f0,
-    type: 3}
-  m_Building_defense: {fileID: 8300000, guid: b913858ed824a564c91cc03916da1283, type: 3}
-  m_Building_energy_plant: {fileID: 8300000, guid: c88cc436b8a337f4d832c07d4038dbb3,
-    type: 3}
-  m_Building_naval_academy: {fileID: 8300000, guid: 43b3cf0e611950945a8aa4ad62baddb9,
-    type: 3}
-  m_Building_prison: {fileID: 8300000, guid: 1bd75e68dd6dc7141b10996d67aba185, type: 3}
-  m_Building_radar: {fileID: 8300000, guid: 91accd17105a8a5408e0453b21eaaa5c, type: 3}
-  m_Building_research: {fileID: 8300000, guid: 23681019dcc1e4a4f931f1710bc21e12, type: 3}
-  m_Building_ship_design: {fileID: 8300000, guid: 57f2cbf4fd0a51245b79916b7ad52351,
-    type: 3}
-  m_Building_shipyard: {fileID: 8300000, guid: a5535dce7fb23b9478d4c4e803729ded, type: 3}
-  m_Building_trading_post: {fileID: 8300000, guid: a75cd28079514d546be08388433c4895,
-    type: 3}
-  m_WarBeginSound: {fileID: 8300000, guid: 98a860f11f8a45a488d019dcb720ad01, type: 3}
-  m_popup_positive_click: {fileID: 8300000, guid: 2aeda8ff79f320b46893fa54d254893a,
-    type: 3}
-  m_popup_negative_click: {fileID: 8300000, guid: b2bfa56c91397714eb5c350ca3a772b1,
-    type: 3}
-  m_Energy_Building_Voice:
-  - {fileID: 8300000, guid: da7f9b7de9ba5d8409d07c34d43ae262, type: 3}
-  - {fileID: 8300000, guid: 2a3c29f1ab9a3824a81f8d4f1e0cb965, type: 3}
-  m_Trade_Building_Voice:
-  - {fileID: 8300000, guid: b5d8535dc43997147ab852b7c269db20, type: 3}
-  - {fileID: 8300000, guid: a5cfe2df3a6319a45a73966dbe51dd47, type: 3}
-  m_Shipyard_Building_Voice:
-  - {fileID: 8300000, guid: 28ae9a0af34c98e43b8f5068d4ba37a4, type: 3}
-  - {fileID: 8300000, guid: 19420c8b14168e048a1534103f8eda2f, type: 3}
-  m_Design_Building_Voice:
-  - {fileID: 8300000, guid: 4cc8f26a776a50e48b6eeef0fac6981a, type: 3}
-  - {fileID: 8300000, guid: 976772bf48f61bc46bc7af668e114d55, type: 3}
-  m_Research_Building_Voice:
-  - {fileID: 8300000, guid: ee3bb591e4837f04da5debc94ec7b58a, type: 3}
-  - {fileID: 8300000, guid: 6aa5b92a839a71e4caf707579e352bff, type: 3}
-  m_Defence_Building_Voice:
-  - {fileID: 8300000, guid: 00f49c8be0f800f45bb32fffdde8bde6, type: 3}
-  - {fileID: 8300000, guid: 7dac285d5e547e5489675259a7679955, type: 3}
-  m_Academy_Building_Voice:
-  - {fileID: 8300000, guid: e987e442e0a1a8247a87c1ec73c02d34, type: 3}
-  - {fileID: 8300000, guid: 7fbdd15e8d143fb42a53efffaa7b5e92, type: 3}
-  m_Prison_Building_Voice:
-  - {fileID: 8300000, guid: 6aa8522ec6182aa48b6084c4a4808811, type: 3}
-  - {fileID: 8300000, guid: fb1b0143b7f0a07408f4298964b8c7d0, type: 3}
-  m_Radar_Building_Voice:
-  - {fileID: 8300000, guid: b41d83249160ddc45986f923c5f796fe, type: 3}
-  - {fileID: 8300000, guid: c2c741aa4dd207b4a8b6bb46ccc798fe, type: 3}
-  m_StartBuild_Voice: {fileID: 8300000, guid: 20e78533ff2eca241967d9e896c32f77, type: 3}
-  m_StartUpgrade_Voice: {fileID: 8300000, guid: 66421c6f7bf922347a8dc51329e5c387,
-    type: 3}
-  m_BuildUpComplete_Voice: {fileID: 8300000, guid: 1d4ec54228ea2ce41b217bfeded4daf4,
-    type: 3}
-  m_CancelBuild_Voice: {fileID: 8300000, guid: 270d85c61f0759c449850b0a1e34129e, type: 3}
-  m_StartBuildShip_Voice: {fileID: 8300000, guid: 38bbaead7fa5f71449544b4cbe262235,
-    type: 3}
-  m_DisbandFleet_Voice: {fileID: 8300000, guid: 44aa6655aa9c0d044b45c446cde1d19c,
-    type: 3}
-  m_CreateUnion_Voice: {fileID: 8300000, guid: 2387ebc3538f69a4b883751cb6005858, type: 3}
-  m_JoinUnion_Voice: {fileID: 8300000, guid: 1afb3a2753df26540968dfdace059e80, type: 3}
-  m_Recruit_Voice: {fileID: 8300000, guid: 74efa913a01b951409c27f1583d06411, type: 3}
-  m_FleetIdle_Voice: {fileID: 8300000, guid: fdd497aedc5827b41b7e75057f23d5a3, type: 3}
-  m_FleetAttack_Voice: {fileID: 8300000, guid: d3dc663e077f3e14ea5805779d581b83, type: 3}
-  m_FleetScan_Voice: {fileID: 8300000, guid: f368cd8ee25ed95448edaecfac6d2b51, type: 3}
-  m_WorkShipBuild_Voice: {fileID: 8300000, guid: 4692ae5f2d9243747b050b650f764e88,
-    type: 3}
-  m_WorkShipCollect_Voice: {fileID: 8300000, guid: 9218b5fecc6c8724181f259e53e8e66a,
-    type: 3}
-  m_WorkShipRepair_Voice: {fileID: 8300000, guid: e2887018d6207f747a9e0e2f31649aff,
-    type: 3}
-  m_CreateLegion_Voice: {fileID: 8300000, guid: dc62e332cbb0ee0498eb77b403abe87c,
-    type: 3}
-  m_ScanComplete_Voice: {fileID: 8300000, guid: 13e552d5f47e18e448e1b1d92505e37f,
-    type: 3}
-  m_ClickUnionHelp_Voice: {fileID: 8300000, guid: d875a55a25a24044cbcb0d5e6fbf84f7,
-    type: 3}
-  m_DailyTaskComplete_Voice: {fileID: 8300000, guid: 742c56cbd0b16c54da386a230c49bfa2,
-    type: 3}
-  m_NewMail_Voice: {fileID: 8300000, guid: 76650adc0924ec5428326b8dadcc6b22, type: 3}
-  m_StationJump_Voice: {fileID: 8300000, guid: 14b4974f5240f0b4b831d12ff3a326d7, type: 3}
-  m_MoveToMe_Voice: {fileID: 8300000, guid: 086b300f86d1c8d41bec158e3c18fb73, type: 3}
-  m_RepairShipComplete_Voice: {fileID: 8300000, guid: 087c69bfe5f1d6247abd71ca1d9b11cd,
-    type: 3}
-  m_GalaxyProbe_Voice: {fileID: 8300000, guid: 29fb9ee03871d184bba09b8175bd8ab7, type: 3}
-  m_BeAttack_Voice: {fileID: 8300000, guid: 61bf9444ba996254db16e2fdfab06a00, type: 3}
-  m_ResearchComplete_Voice: {fileID: 8300000, guid: 191729d63c7cbe248b9844cb6ae842f2,
-    type: 3}
-  m_BattleVictory_Voice: {fileID: 8300000, guid: 836859dd5842efc418352fac40f7d253,
-    type: 3}
-  m_BattleFail_Voice: {fileID: 8300000, guid: 3b72af91bf010674cac406a203d5afca, type: 3}
-  m_HeroBeCaptured_Voice: {fileID: 8300000, guid: 11d2a56e3d2dc38439d6470a33dbdc62,
-    type: 3}
-  m_NotEnoughEnergy_Voice: {fileID: 8300000, guid: f4625018f9938d848a5d2f7bf68fb34d,
-    type: 3}
-  m_NotEnoughMinerals_Voice: {fileID: 8300000, guid: afde6212981c3cd41a98b9a2844c4773,
-    type: 3}
-  m_NotEnoughAlloy_Voice: {fileID: 8300000, guid: 2d15c81793f222e46bac5eb0fe03dc6f,
-    type: 3}
-  m_NotEnoughCrystals_Voice: {fileID: 8300000, guid: 31acec0b44173024ca3c1c9a99b38224,
-    type: 3}
-  m_NotEnoughRes_Voice: {fileID: 8300000, guid: 54e3355f61226fd499412f91b257444e,
-    type: 3}
-  m_JumpNotReady_Voice: {fileID: 8300000, guid: 627f489214e0d0f48b15673b4f3ac339,
-    type: 3}
-  m_UnionWarBegin_Voice: {fileID: 8300000, guid: 411e42cb8bf3798438325be2036fe008,
-    type: 3}
-  m_EventBegin_Voice: {fileID: 8300000, guid: 4053fb7b4f0e3bb40a90640fb9d6d945, type: 3}
-  m_UnionMenberBeAttack_Voice: {fileID: 8300000, guid: 60ebbb173c5cb0b4fb229d220ea2ef11,
-    type: 3}
-  m_FractureOpen_Voice: {fileID: 8300000, guid: 182b41d4b4e082a49a7688f70ea314c4,
-    type: 3}
-  m_Welcome_Voice: {fileID: 8300000, guid: 714e1772a002af74cadaf80711a22395, type: 3}
-  m_AchieveCanGet_Voice: {fileID: 8300000, guid: ae53c74fb5319bd48a47b46853663de6,
-    type: 3}
-  m_PrizeBoxCanGet_Voice: {fileID: 8300000, guid: ced5dc5a2a96d9749a6b9929d8376e19,
-    type: 3}
-  m_Unknow_Voice: {fileID: 8300000, guid: 6333191690ea52e44a66ee3354782863, type: 3}
-  m_Warning_Voice: {fileID: 8300000, guid: 28053a0521abd494f975d22f7a5f93e5, type: 3}
-  m_Alert_Voice: {fileID: 8300000, guid: a998b59a2b06c1b4bb1d3b383d926c9e, type: 3}
-  m_BeDeclared_Voice: {fileID: 8300000, guid: ef46d7d42a2b966428b6938a7f2a60a7, type: 3}
-  m_pAudioSource: {fileID: 8283756}
---- !u!1001 &100100000
-Prefab:
-  m_ObjectHideFlags: 1
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications: []
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 194048}
-  m_IsPrefabParent: 1

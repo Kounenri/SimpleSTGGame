@@ -73,6 +73,8 @@ public class InitApplication : MonoBehaviour
 	{
 		ViewManager.GetInstance.Initialize();
 
+		LevelController.GetInstance.Initialize();
+
 		// For iPhone notch
 		//ScreenEdges.Create();
 

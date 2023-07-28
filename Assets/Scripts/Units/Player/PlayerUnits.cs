@@ -26,4 +26,14 @@ public class PlayerUnits : BaseUnits
 
 		base.OnDead();
 	}
+
+	public void FireWeapon()
+	{
+
+	}
+
+	public void ReloadWeapon()
+	{
+
+	}
 }

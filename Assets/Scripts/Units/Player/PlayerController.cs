@@ -1,3 +1,4 @@
+using Cinemachine;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -69,8 +70,6 @@ public class PlayerController : MonoBehaviour
 	private int m_AnimIDFireSingle;
 	private int m_AnimIDFireBurst;
 	private int m_AnimIDFireAuto;
-	private int m_AnimIDReload;
-	private int m_AnimIDDie;
 	private int m_AnimIDJump;
 	private int m_AnimIDRun;
 	private int m_AnimIDGrounded;
@@ -96,13 +95,26 @@ public class PlayerController : MonoBehaviour
 		AssignAnimationIDs();
 	}
 
+	private void OnEnable()
+	{
+		var pCinemachineVirtualCamera = FindObjectOfType<CinemachineVirtualCamera>();
+
+		if (pCinemachineVirtualCamera != null)
+		{
+			pCinemachineVirtualCamera.Follow = transform;
+		}
+	}
+
 	private void Update()
 	{
 		m_HasAnimator = TryGetComponent(out m_Animator);
 
-		JumpAndGravity();
-		GroundedCheck();
-		Move();
+		if (!m_PlayerUnits.IsDead())
+		{
+			JumpAndGravity();
+			GroundedCheck();
+			Move();
+		}
 	}
 
 	private void AssignAnimationIDs()
@@ -111,8 +123,6 @@ public class PlayerController : MonoBehaviour
 		m_AnimIDFireSingle = Animator.StringToHash("FireSingle");
 		m_AnimIDFireBurst = Animator.StringToHash("FireBurst");
 		m_AnimIDFireAuto = Animator.StringToHash("FireAuto");
-		m_AnimIDReload = Animator.StringToHash("Reload");
-		m_AnimIDDie = Animator.StringToHash("Die");
 		m_AnimIDJump = Animator.StringToHash("Jump");
 		m_AnimIDRun = Animator.StringToHash("Run");
 		m_AnimIDGrounded = Animator.StringToHash("Grounded");
@@ -193,7 +203,7 @@ public class PlayerController : MonoBehaviour
 		m_Controller.Move(pMotion);
 
 		// update animator if using character
-		if (m_HasAnimator && !m_PlayerUnits.IsDead())
+		if (m_HasAnimator)
 		{
 			if (m_Speed > 0.1f)
 			{
@@ -340,6 +350,7 @@ public class PlayerController : MonoBehaviour
 	{
 		if (!m_PlayerUnits.IsDead())
 		{
+			m_PlayerUnits.FireWeapon();
 		}
 	}
 
@@ -347,6 +358,17 @@ public class PlayerController : MonoBehaviour
 	{
 		if (!m_PlayerUnits.IsDead())
 		{
+			m_PlayerUnits.ReloadWeapon();
+
+			// update animator if using character
+			if (m_HasAnimator)
+			{
+				m_Animator.Play("Reload");
+				m_Animator.SetBool(m_AnimIDFront, false);
+				m_Animator.SetBool(m_AnimIDBack, false);
+				m_Animator.SetBool(m_AnimIDLeft, false);
+				m_Animator.SetBool(m_AnimIDRight, false);
+			}
 		}
 	}
 
@@ -357,7 +379,7 @@ public class PlayerController : MonoBehaviour
 			// update animator if using character
 			if (m_HasAnimator)
 			{
-				m_Animator.SetBool(m_AnimIDDie, true);
+				m_Animator.Play("Die");
 				m_Animator.SetBool(m_AnimIDFront, false);
 				m_Animator.SetBool(m_AnimIDBack, false);
 				m_Animator.SetBool(m_AnimIDLeft, false);

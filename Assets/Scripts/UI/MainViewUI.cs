@@ -29,7 +29,7 @@ public class MainViewUI : BaseCanvas
 	{
 		if (LevelController.HasInstance)
 		{
-			LevelController.GetInstance.RemoveEventListener(LevelController.ON_PLAYER_HP_CHANGED);
+			LevelController.GetInstance.RemoveEventListener(LevelController.ON_PLAYER_HP_CHANGED, OnPlayerHPChanged);
 		}
 
 		base.OnDestroy();

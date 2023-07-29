@@ -90,6 +90,11 @@ public class PlayerController : MonoBehaviour
 
 	private void Start()
 	{
+		if (LevelController.HasInstance)
+		{
+			LevelController.GetInstance.AddEventListener(LevelController.ON_PLAYER_DEAD, OnPlayerDead);
+		}
+
 		m_HasAnimator = TryGetComponent(out m_Animator);
 
 		AssignAnimationIDs();
@@ -114,6 +119,30 @@ public class PlayerController : MonoBehaviour
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if (LevelController.HasInstance)
+		{
+			LevelController.GetInstance.RemoveEventListener(LevelController.ON_PLAYER_DEAD, OnPlayerDead);
+		}
+	}
+
+	private void OnPlayerDead(TEvent pTEvent)
+	{
+		if (m_PlayerUnits.IsDead())
+		{
+			// update animator if using character
+			if (m_HasAnimator)
+			{
+				m_Animator.Play("Die");
+				m_Animator.SetBool(m_AnimIDFront, false);
+				m_Animator.SetBool(m_AnimIDBack, false);
+				m_Animator.SetBool(m_AnimIDLeft, false);
+				m_Animator.SetBool(m_AnimIDRight, false);
+			}
 		}
 	}
 
@@ -358,28 +387,12 @@ public class PlayerController : MonoBehaviour
 	{
 		if (!m_PlayerUnits.IsDead())
 		{
-			m_PlayerUnits.ReloadWeapon();
+			bool bResult = m_PlayerUnits.ReloadWeapon();
 
 			// update animator if using character
-			if (m_HasAnimator)
+			if (bResult && m_HasAnimator)
 			{
 				m_Animator.Play("Reload");
-				m_Animator.SetBool(m_AnimIDFront, false);
-				m_Animator.SetBool(m_AnimIDBack, false);
-				m_Animator.SetBool(m_AnimIDLeft, false);
-				m_Animator.SetBool(m_AnimIDRight, false);
-			}
-		}
-	}
-
-	public void OnDead()
-	{
-		if (m_PlayerUnits.IsDead())
-		{
-			// update animator if using character
-			if (m_HasAnimator)
-			{
-				m_Animator.Play("Die");
 				m_Animator.SetBool(m_AnimIDFront, false);
 				m_Animator.SetBool(m_AnimIDBack, false);
 				m_Animator.SetBool(m_AnimIDLeft, false);

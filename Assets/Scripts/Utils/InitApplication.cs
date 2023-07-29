@@ -77,6 +77,8 @@ public class InitApplication : MonoBehaviour
 
 		WeaponConfProxy.GetInstance.ParseConfig();
 
+		ObjectPoolManager.Create();
+
 		// For iPhone notch
 		//ScreenEdges.Create();
 

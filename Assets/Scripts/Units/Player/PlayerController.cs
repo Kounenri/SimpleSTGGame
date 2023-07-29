@@ -43,9 +43,13 @@ public class PlayerController : MonoBehaviour
 	[SerializeField]
 	private AudioClip m_LandingAudioClip;
 	[SerializeField]
-	private AudioClip m_ReloadAudioClip;
+	private AudioClip[] m_FireAudioClip;
+	[SerializeField]
+	private AudioClip[] m_ReloadAudioClip;
 	[SerializeField]
 	private AudioClip m_DieAudioClip;
+	[SerializeField]
+	private GameObject m_FirePoint;
 
 	private PlayerUnits m_PlayerUnits;
 	private Camera m_MainCamera;
@@ -57,7 +61,7 @@ public class PlayerController : MonoBehaviour
 	private float m_Speed;
 	private float m_AnimationBlend;
 	private float m_TargetRotation = 0.0f;
-	private float m_RotationVelocity;
+	//private float m_RotationVelocity;
 	private float m_VerticalVelocity;
 	private float m_TerminalVelocity = 53.0f;
 
@@ -67,9 +71,6 @@ public class PlayerController : MonoBehaviour
 
 	// animation IDs
 	private int m_AnimIDSpeed;
-	private int m_AnimIDFireSingle;
-	private int m_AnimIDFireBurst;
-	private int m_AnimIDFireAuto;
 	private int m_AnimIDJump;
 	private int m_AnimIDRun;
 	private int m_AnimIDGrounded;
@@ -79,7 +80,8 @@ public class PlayerController : MonoBehaviour
 	private int m_AnimIDRight;
 	private int m_AnimIDMotionSpeed;
 
-	private bool m_HasAnimator;
+	private bool m_HasAnimator = false;
+	private bool m_IsFireKeyPressed = false;
 
 	private void Awake()
 	{
@@ -116,6 +118,17 @@ public class PlayerController : MonoBehaviour
 
 		if (!m_PlayerUnits.IsDead())
 		{
+			if (m_IsFireKeyPressed)
+			{
+				(bool bResult, WeaponVO pWeaponVO) = m_PlayerUnits.FireWeapon();
+
+				if (bResult) { Fire(pWeaponVO); }
+				else if (m_PlayerUnits.LeftBulletCount <= 0)
+				{
+					ReloadWeapon();
+				}
+			}
+
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
@@ -146,12 +159,24 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	private void ReloadWeapon()
+	{
+		bool bResult = m_PlayerUnits.ReloadWeapon();
+
+		// update animator if using character
+		if (bResult && m_HasAnimator)
+		{
+			m_Animator.Play("Reload");
+			m_Animator.SetBool(m_AnimIDFront, false);
+			m_Animator.SetBool(m_AnimIDBack, false);
+			m_Animator.SetBool(m_AnimIDLeft, false);
+			m_Animator.SetBool(m_AnimIDRight, false);
+		}
+	}
+
 	private void AssignAnimationIDs()
 	{
 		m_AnimIDSpeed = Animator.StringToHash("Speed");
-		m_AnimIDFireSingle = Animator.StringToHash("FireSingle");
-		m_AnimIDFireBurst = Animator.StringToHash("FireBurst");
-		m_AnimIDFireAuto = Animator.StringToHash("FireAuto");
 		m_AnimIDJump = Animator.StringToHash("Jump");
 		m_AnimIDRun = Animator.StringToHash("Run");
 		m_AnimIDGrounded = Animator.StringToHash("Grounded");
@@ -172,6 +197,33 @@ public class PlayerController : MonoBehaviour
 		if (m_HasAnimator)
 		{
 			m_Animator.SetBool(m_AnimIDGrounded, m_Grounded);
+		}
+	}
+
+	private void Fire(WeaponVO pWeaponVO)
+	{
+		GameObject pBulletObject = ObjectPoolManager.GetInstance.Get("Bullet");
+
+		BulletUnits pBulletUnits = pBulletObject.GetComponent<BulletUnits>();
+
+		pBulletUnits.Fire(transform.forward, pWeaponVO.Damage, pWeaponVO.BulletSpeed, pWeaponVO.IsPenetrable);
+		pBulletUnits.transform.position = m_FirePoint.transform.position;
+
+		// update animator if using character
+		if (m_HasAnimator)
+		{
+			if (pWeaponVO.ID == 1 || pWeaponVO.ID == 4)
+			{
+				m_Animator.Play("Shoot_SingleShot_AR");
+			}
+			else if (pWeaponVO.ID == 2)
+			{
+				m_Animator.Play("Shoot_BurstShot_AR");
+			}
+			else if (pWeaponVO.ID == 3)
+			{
+				m_Animator.Play("Shoot_Autoshot_AR");
+			}
 		}
 	}
 
@@ -217,9 +269,9 @@ public class PlayerController : MonoBehaviour
 		// if there is a move input rotate player when the player is moving
 		if (m_MoveAmount != Vector2.zero)
 		{
-			m_TargetRotation = Mathf.Atan2(pInputDirection.x, pInputDirection.z) * Mathf.Rad2Deg + m_MainCamera.transform.eulerAngles.y;
+			m_TargetRotation = Mathf.Atan2(pInputDirection.x, pInputDirection.z) * Mathf.Rad2Deg;// + m_MainCamera.transform.eulerAngles.y;
 
-			float fRotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, m_TargetRotation, ref m_RotationVelocity, m_RotationSmoothTime);
+			//float fRotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, m_TargetRotation, ref m_RotationVelocity, m_RotationSmoothTime);
 
 			// rotate to face input direction relative to camera position
 			//transform.rotation = Quaternion.Euler(0.0f, fRotation, 0.0f);
@@ -236,11 +288,22 @@ public class PlayerController : MonoBehaviour
 		{
 			if (m_Speed > 0.1f)
 			{
-				m_Animator.SetBool(m_AnimIDFront, pTargetDirection.z > 0);
-				m_Animator.SetBool(m_AnimIDBack, pTargetDirection.z < 0);
+				float fAngle = Vector3.Angle(transform.forward, pMotion);
 
-				m_Animator.SetBool(m_AnimIDRight, pTargetDirection.x > 0);
-				m_Animator.SetBool(m_AnimIDLeft, pTargetDirection.x < 0);
+				if (fAngle < 45 || fAngle > 135)
+				{
+					m_Animator.SetBool(m_AnimIDFront, Vector3.Dot(transform.forward, pMotion) > 0);
+					m_Animator.SetBool(m_AnimIDBack, Vector3.Dot(transform.forward, pMotion) < 0);
+					m_Animator.SetBool(m_AnimIDRight, false);
+					m_Animator.SetBool(m_AnimIDLeft, false);
+				}
+				else
+				{
+					m_Animator.SetBool(m_AnimIDFront, false);
+					m_Animator.SetBool(m_AnimIDBack, false);
+					m_Animator.SetBool(m_AnimIDRight, Vector3.Dot(transform.right, pMotion) > 0);
+					m_Animator.SetBool(m_AnimIDLeft, Vector3.Dot(transform.right, pMotion) < 0);
+				}
 			}
 			else
 			{
@@ -342,11 +405,19 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	private void OnFireSound(AnimationEvent animationEvent)
+	{
+		if (animationEvent.animatorClipInfo.weight > 0.5f)
+		{
+			SoundManager.PlaySound(m_FireAudioClip[LevelController.GetInstance.CurrentWeapon.ID - 1], 0, m_FootstepAudioVolume);
+		}
+	}
+
 	private void OnReloadSound(AnimationEvent animationEvent)
 	{
 		if (animationEvent.animatorClipInfo.weight > 0.5f)
 		{
-			SoundManager.PlaySound(m_ReloadAudioClip, 0, m_FootstepAudioVolume);
+			SoundManager.PlaySound(m_ReloadAudioClip[LevelController.GetInstance.CurrentWeapon.ID - 1], 0, m_FootstepAudioVolume);
 		}
 	}
 
@@ -369,6 +440,8 @@ public class PlayerController : MonoBehaviour
 
 	public void OnJump(InputAction.CallbackContext context)
 	{
+		if (!context.started) return;
+
 		if (!m_PlayerUnits.IsDead())
 		{
 			m_Jump = true;
@@ -377,27 +450,18 @@ public class PlayerController : MonoBehaviour
 
 	public void OnFire(InputAction.CallbackContext context)
 	{
-		if (!m_PlayerUnits.IsDead())
-		{
-			m_PlayerUnits.FireWeapon();
-		}
+		if (context.started) m_IsFireKeyPressed = true;
+
+		if (context.canceled) m_IsFireKeyPressed = false;
 	}
 
 	public void OnReload(InputAction.CallbackContext context)
 	{
+		if (!context.started) return;
+
 		if (!m_PlayerUnits.IsDead())
 		{
-			bool bResult = m_PlayerUnits.ReloadWeapon();
-
-			// update animator if using character
-			if (bResult && m_HasAnimator)
-			{
-				m_Animator.Play("Reload");
-				m_Animator.SetBool(m_AnimIDFront, false);
-				m_Animator.SetBool(m_AnimIDBack, false);
-				m_Animator.SetBool(m_AnimIDLeft, false);
-				m_Animator.SetBool(m_AnimIDRight, false);
-			}
+			ReloadWeapon();
 		}
 	}
 
@@ -408,8 +472,8 @@ public class PlayerController : MonoBehaviour
 			// read the value for the "Pointer Move" action each event call
 			Vector2 pPointerPosition = context.ReadValue<Vector2>();
 
-			(bool bIsSuccess, Vector3 pPosition) = GetCursorPosition(pPointerPosition);
-			if (bIsSuccess)
+			(bool bSuccess, Vector3 pPosition) = GetCursorPosition(pPointerPosition);
+			if (bSuccess)
 			{
 				// Calculate the direction
 				Vector3 pDirection = pPosition - transform.position;
@@ -423,19 +487,19 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	private (bool bIsSuccess, Vector3 pPosition) GetCursorPosition(Vector2 pPointerPosition)
+	private (bool, Vector3) GetCursorPosition(Vector2 pPointerPosition)
 	{
 		Ray pRay = m_MainCamera.ScreenPointToRay(pPointerPosition);
 
 		if (Physics.Raycast(pRay, out RaycastHit pHitInfo, 200f))
 		{
 			// The Raycast hit something, return with the position.
-			return (bIsSuccess: true, pPosition: pHitInfo.point);
+			return (true, pHitInfo.point);
 		}
 		else
 		{
 			// The Raycast did not hit anything.
-			return (bIsSuccess: false, pPosition: Vector3.zero);
+			return (false, Vector3.zero);
 		}
 	}
 }

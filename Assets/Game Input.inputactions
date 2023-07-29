@@ -198,18 +198,7 @@
                 {
                     "name": "",
                     "id": "e06dbae1-bf5d-4933-90d6-2f02a0225591",
-                    "path": "<Gamepad>/buttonEast",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Reload",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "0ac56a74-2a6f-4c3f-b8cd-14dbff0b244c",
-                    "path": "<Mouse>/rightButton",
+                    "path": "<Keyboard>/r",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",

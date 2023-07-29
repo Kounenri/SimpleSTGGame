@@ -1,13 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BaseUnits : MonoBehaviour
 {
 	[SerializeField]
-	private float m_TotalHP = 100f;
+	protected float m_TotalHP = 100f;
 	[SerializeField]
-	private float m_MoveSpeed = 2.0f;
+	protected float m_MoveSpeed = 2.0f;
 
 	protected float m_CurrentHP = 0f;
 
@@ -21,28 +19,6 @@ public class BaseUnits : MonoBehaviour
 		get { return m_MoveSpeed; }
 	}
 
-	public void ResetUnit()
-	{
-		m_CurrentHP = m_TotalHP;
-	}
-
-	public void BeAttack(float fDamage)
-	{
-		m_CurrentHP -= fDamage;
-
-		OnHPChange();
-
-		if (m_CurrentHP < 0f)
-		{
-			OnDead();
-		}
-	}
-
-	protected virtual void Awake()
-	{
-		m_CurrentHP = m_TotalHP;
-	}
-
 	protected virtual void OnHPChange()
 	{
 
@@ -51,5 +27,24 @@ public class BaseUnits : MonoBehaviour
 	protected virtual void OnDead()
 	{
 
+	}
+
+	public virtual void ResetUnit()
+	{
+		m_CurrentHP = m_TotalHP;
+
+		OnHPChange();
+	}
+
+	public void BeAttack(float fDamage)
+	{
+		m_CurrentHP -= fDamage;
+
+		OnHPChange();
+
+		if (IsDead())
+		{
+			OnDead();
+		}
 	}
 }

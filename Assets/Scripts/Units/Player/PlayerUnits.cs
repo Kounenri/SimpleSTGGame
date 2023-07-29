@@ -1,25 +1,45 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerUnits : BaseUnits
 {
-	private PlayerController m_PlayerController;
+	private WeaponVO m_CurrentWeapon;
 
+	private int m_LeftBulletCount = 0;
+	private bool m_IsReloadingWeapon = false;
 	private float m_LastFireTime = 0f;
 	private float m_LastReloadTime = 0f;
 
-	protected override void Awake()
-	{
-		base.Awake();
+	public bool IsReloadingWeapon { get { return m_IsReloadingWeapon; } }
 
-		m_PlayerController = GetComponent<PlayerController>();
-	}
+	public int LeftBulletCount { get { return m_LeftBulletCount; } }
 
-	private void OnEnable()
+	private void Awake()
 	{
 		if (LevelController.HasInstance)
 		{
+			LevelController.GetInstance.AddEventListener(LevelController.ON_WEAPON_CHANGE, OnWeaponChange);
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if (LevelController.HasInstance)
+		{
+			LevelController.GetInstance.RemoveEventListener(LevelController.ON_WEAPON_CHANGE, OnWeaponChange);
+		}
+	}
+
+	private void OnWeaponChange(TEvent pTEvent)
+	{
+		if (pTEvent != null)
+		{
+			m_CurrentWeapon = pTEvent.Data as WeaponVO;
+		}
+		else
+		{
+			m_CurrentWeapon = LevelController.GetInstance.CurrentWeapon;
+
+			m_LeftBulletCount = m_CurrentWeapon.Capacity;
 		}
 	}
 
@@ -37,28 +57,79 @@ public class PlayerUnits : BaseUnits
 		base.OnDead();
 	}
 
-	public void FireWeapon()
+	public override void ResetUnit()
 	{
-		if (LevelController.GetInstance.FireReady())
-		{
-			WeaponVO pWeapon = LevelController.GetInstance.CurrentWeapon;
+		base.ResetUnit();
 
-		}
-		else if (LevelController.GetInstance.LeftBulletCount <= 0)
+		OnWeaponChange(null);
+
+		m_LeftBulletCount = m_CurrentWeapon.Capacity;
+
+		m_IsReloadingWeapon = false;
+		m_LastFireTime = 0f;
+		m_LastReloadTime = 0f;
+
+		LevelController.GetInstance.BulletCountChange(m_LeftBulletCount);
+	}
+
+	public bool FireReady()
+	{
+		return !m_IsReloadingWeapon && m_LeftBulletCount > 0;
+	}
+
+	public (bool, WeaponVO) FireWeapon()
+	{
+		if (!IsDead() && FireReady())
 		{
-			ReloadWeapon();
+			if (m_LastFireTime == 0f || Time.time - m_LastFireTime > m_CurrentWeapon.ShootingInterval)
+			{
+				m_LastFireTime = Time.time;
+
+				m_LeftBulletCount--;
+
+				LevelController.GetInstance.BulletCountChange(m_LeftBulletCount);
+
+				return (true, m_CurrentWeapon);
+			}
 		}
+
+		return (false, null);
+	}
+
+	public bool CanReloadWeapon()
+	{
+		return !m_IsReloadingWeapon && m_LeftBulletCount < m_CurrentWeapon.Capacity;
 	}
 
 	public bool ReloadWeapon()
 	{
-		if (LevelController.GetInstance.CanReloadWeapon())
+		if (m_LastReloadTime == 0f || Time.time - m_LastReloadTime > m_CurrentWeapon.ReloadDuration)
 		{
-			LevelController.GetInstance.ReloadWeapon();
+			if (!IsDead() && CanReloadWeapon())
+			{
+				if (!m_IsReloadingWeapon)
+				{
+					m_IsReloadingWeapon = true;
 
-			return true;
+					Invoke(nameof(OnReloadWeapon), m_CurrentWeapon.ReloadDuration);
+
+					m_LastReloadTime = Time.time;
+
+					return true;
+				}
+			}
 		}
 
 		return false;
+	}
+
+	private void OnReloadWeapon()
+	{
+		m_IsReloadingWeapon = false;
+
+		m_LeftBulletCount = m_CurrentWeapon.Capacity;
+
+		LevelController.GetInstance.DoneReloadWeapon();
+		LevelController.GetInstance.BulletCountChange(m_LeftBulletCount);
 	}
 }

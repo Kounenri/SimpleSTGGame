@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(EnemyUnits))]
 public class EnemyController : MonoBehaviour
@@ -26,6 +27,7 @@ public class EnemyController : MonoBehaviour
 	private int m_AnimIDRun;
 
 	private bool m_HasAnimator;
+	public bool m_WaitForSetPosition = true;
 
 	private void Awake()
 	{
@@ -38,6 +40,13 @@ public class EnemyController : MonoBehaviour
 		m_HasAnimator = TryGetComponent(out m_Animator);
 
 		AssignAnimationIDs();
+	}
+
+	private void OnEnable()
+	{
+		m_Controller.enabled = true;
+
+		m_WaitForSetPosition = true;
 	}
 
 	private void AssignAnimationIDs()
@@ -53,69 +62,47 @@ public class EnemyController : MonoBehaviour
 
 		if (!m_EnemyUnits.IsDead())
 		{
-			Vector3 pMoveAmount = m_EnemyUnits.GetPlayerPosition() - transform.position;
+			Vector3 pTargetDirection = m_EnemyUnits.GetPlayerPosition() - transform.position;
 
-			if (pMoveAmount.magnitude < m_EnemyUnits.AttackRange && !m_EnemyUnits.PlayerUnits.IsDead())
+			if (pTargetDirection.magnitude < m_EnemyUnits.AttackRange && !m_EnemyUnits.PlayerUnits.IsDead())
 			{
 				Attack();
 			}
-			else
+			else if (!m_WaitForSetPosition)
 			{
-				Move(pMoveAmount);
+				Move(pTargetDirection);
 			}
+
+			m_WaitForSetPosition = false;
 		}
 	}
 
-	private void Move(Vector3 pMoveAmount)
+	private void Move(Vector3 pTargetDirection)
 	{
 		// set target speed based on move speed
-		float fTargetSpeed = m_EnemyUnits.MoveSpeed;
+		m_Speed = m_EnemyUnits.MoveSpeed;
 
-		if (m_EnemyUnits.PlayerUnits.IsDead()) fTargetSpeed = 0.0f;
+		if (m_EnemyUnits.PlayerUnits.IsDead()) m_Speed = 0.0f;
 
-		// a reference to the players current horizontal velocity
-		float fCurrentHorizontalSpeed = new Vector3(m_Controller.velocity.x, 0.0f, m_Controller.velocity.z).magnitude;
-		float fSpeedOffset = 0.1f;
-
-		// accelerate or decelerate to target speed
-		if (fCurrentHorizontalSpeed < fTargetSpeed - fSpeedOffset || fCurrentHorizontalSpeed > fTargetSpeed + fSpeedOffset)
-		{
-			// creates curved result rather than a linear one giving a more organic speed change
-			// note T in Lerp is clamped, so we don't need to clamp our speed
-			m_Speed = Mathf.Lerp(fCurrentHorizontalSpeed, fTargetSpeed, Time.deltaTime * m_SpeedChangeRate);
-
-			// round speed to 3 decimal places
-			m_Speed = Mathf.Round(m_Speed * 1000f) / 1000f;
-		}
-		else
-		{
-			m_Speed = fTargetSpeed;
-		}
-
-		m_AnimationBlend = Mathf.Lerp(m_AnimationBlend, fTargetSpeed, Time.deltaTime * m_SpeedChangeRate);
+		m_AnimationBlend = Mathf.Lerp(m_AnimationBlend, m_Speed, Time.deltaTime * m_SpeedChangeRate);
 
 		if (m_AnimationBlend < 0.01f) m_AnimationBlend = 0f;
 
-		Vector2 pMoveAmount2 = new Vector2(pMoveAmount.x, pMoveAmount.z);
-
 		// normalise target direction
-		Vector3 pTargetDirection = new Vector3(pMoveAmount2.x, 0.0f, pMoveAmount2.y).normalized;
+		pTargetDirection = pTargetDirection.normalized;
 
-		// note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
 		// if there is a move target rotate player when the player is moving
-		if (pMoveAmount2 != Vector2.zero)
-		{
-			m_TargetRotation = Mathf.Atan2(pTargetDirection.x, pTargetDirection.z) * Mathf.Rad2Deg;
+		m_TargetRotation = Mathf.Atan2(pTargetDirection.x, pTargetDirection.z) * Mathf.Rad2Deg;
 
-			float fRotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, m_TargetRotation, ref m_RotationVelocity, m_RotationSmoothTime);
+		float fRotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, m_TargetRotation, ref m_RotationVelocity, m_RotationSmoothTime);
 
-			// rotate to face target direction relative to camera position
-			transform.rotation = Quaternion.Euler(0.0f, fRotation, 0.0f);
-		}
+		// rotate to face target direction relative to camera position
+		transform.rotation = Quaternion.Euler(0.0f, fRotation, 0.0f);
 
 		pTargetDirection = Quaternion.Euler(0.0f, m_TargetRotation, 0.0f) * Vector3.forward;
 
 		Vector3 pMotion = pTargetDirection.normalized * (m_Speed * Time.deltaTime);
+
 		// move the player
 		m_Controller.Move(pMotion);
 
@@ -159,10 +146,12 @@ public class EnemyController : MonoBehaviour
 	{
 		if (m_EnemyUnits.IsDead())
 		{
+			m_Controller.enabled = false;
+
 			// update animator if using character
 			if (m_HasAnimator)
 			{
-				int nRandom = UnityEngine.Random.Range(0, 1);
+				int nRandom = UnityEngine.Random.Range(0, 2);
 
 				if (nRandom == 0)
 				{

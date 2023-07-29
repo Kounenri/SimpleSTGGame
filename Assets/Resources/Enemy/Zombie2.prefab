@@ -5263,7 +5263,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3305920991726709325}
   - component: {fileID: 7537417665459280382}
-  - component: {fileID: 6165732245420027249}
+  - component: {fileID: 3993781394852836701}
   - component: {fileID: 6856283535290866419}
   - component: {fileID: 4832365515674423079}
   m_Layer: 0
@@ -5313,7 +5313,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!143 &6165732245420027249
+--- !u!143 &3993781394852836701
 CharacterController:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5333,12 +5333,12 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 3
   m_Height: 1.8
-  m_Radius: 0.25
+  m_Radius: 0.5
   m_SlopeLimit: 45
-  m_StepOffset: 0.1
+  m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.95, z: 0}
+  m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!114 &6856283535290866419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5354,7 +5354,7 @@ MonoBehaviour:
   m_TotalHP: 50
   m_MoveSpeed: 3
   m_Damage: 5
-  m_AttackRange: 2
+  m_AttackRange: 2.5
   m_AttackInterval: 1
 --- !u!114 &4832365515674423079
 MonoBehaviour:
@@ -5370,6 +5370,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_RotationSmoothTime: 0.12
   m_SpeedChangeRate: 10
+  m_WaitForSetPosition: 1
 --- !u!1 &2057808353243881084
 GameObject:
   m_ObjectHideFlags: 0

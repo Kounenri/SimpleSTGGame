@@ -37,10 +37,8 @@ public class EnemyUnits : BaseUnits
 		get { return m_PlayerUnits; }
 	}
 
-	protected override void Awake()
+	private void Awake()
 	{
-		base.Awake();
-
 		m_EnemyController = GetComponent<EnemyController>();
 	}
 
@@ -76,7 +74,7 @@ public class EnemyUnits : BaseUnits
 	{
 		if (!IsDead())
 		{
-			if (Time.time - m_LastAttackTime > AttackInterval)
+			if (m_LastAttackTime == 0f || Time.time - m_LastAttackTime > AttackInterval)
 			{
 				m_PlayerUnits.BeAttack(Damage);
 

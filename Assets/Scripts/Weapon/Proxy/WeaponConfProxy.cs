@@ -1,7 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using static UnityEditor.Experimental.GraphView.Port;
 
 /// <summary>
 /// Load config from xml or json
@@ -20,7 +17,7 @@ public class WeaponConfProxy : TConfProxy<WeaponConfProxy, WeaponVO>
 				ShootingInterval = 0.5f,
 				Capacity = 20,
 				BulletSpeed = 10f,
-				ReloadDuration = 0.8f,
+				ReloadDuration = 1f,
 				IsPenetrable = false
 				}
 			},
@@ -31,7 +28,7 @@ public class WeaponConfProxy : TConfProxy<WeaponConfProxy, WeaponVO>
 				ShootingInterval = 0.1f,
 				Capacity = 30,
 				BulletSpeed = 20f,
-				ReloadDuration = 0.8f,
+				ReloadDuration = 1f,
 				IsPenetrable = false
 				}
 			},
@@ -42,7 +39,7 @@ public class WeaponConfProxy : TConfProxy<WeaponConfProxy, WeaponVO>
 				ShootingInterval = 0.2f,
 				Capacity = 30,
 				BulletSpeed = 15f,
-				ReloadDuration = 1f,
+				ReloadDuration = 1.2f,
 				IsPenetrable = false
 				}
 			},
@@ -53,7 +50,7 @@ public class WeaponConfProxy : TConfProxy<WeaponConfProxy, WeaponVO>
 				ShootingInterval = 0.8f,
 				Capacity = 30,
 				BulletSpeed = 30f,
-				ReloadDuration = 1.2f,
+				ReloadDuration = 1.5f,
 				IsPenetrable = true
 				}
 			}

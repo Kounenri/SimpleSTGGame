@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class LevelController : TMonoInstanceLite<LevelController>
 {
 	private PlayerUnits m_CurrentPlayer;
 	private int m_CurrenyEnemyCount;
+	private int m_OnScreenEnemyCount;
 	private Dictionary<int, int> m_EnemyDictionary;
 	private Coroutine m_PlayerCoroutine;
 	private Coroutine m_EnemyCoroutine;
@@ -29,7 +31,8 @@ public class LevelController : TMonoInstanceLite<LevelController>
 
 		ObjectPoolManager.Create();
 
-		LevelManager.GetInstance.OnLevelLoaded();
+		//LevelManager.GetInstance.OnLevelLoaded();
+		HelpView.Create();
 	}
 
 	private void Update()
@@ -42,7 +45,7 @@ public class LevelController : TMonoInstanceLite<LevelController>
 			{
 				m_StartCountDown = false;
 
-				LevelManager.GetInstance.LevelFail(LevelFailEnum.TimeOut);
+				LevelManager.GetInstance.LevelFail(LevelResultEnum.TimeOut);
 			}
 		}
 	}
@@ -74,12 +77,16 @@ public class LevelController : TMonoInstanceLite<LevelController>
 
 		for (int i = 0; i < pLevelVO.EnemyIDList.Count; i++)
 		{
+			m_CurrenyEnemyCount += pLevelVO.EnemyCountList[i];
+
 			m_EnemyDictionary.Add(pLevelVO.EnemyIDList[i], pLevelVO.EnemyCountList[i]);
 		}
 
+		LevelManager.GetInstance.LeftEnemyCountChange(m_CurrenyEnemyCount);
+
 		while (true)
 		{
-			if (m_CurrenyEnemyCount < pLevelVO.EnemyOnScreen)
+			if (m_OnScreenEnemyCount < pLevelVO.EnemyOnScreen)
 			{
 				List<int> pIDList = new();
 
@@ -116,6 +123,8 @@ public class LevelController : TMonoInstanceLite<LevelController>
 		EnemyUnits pEnemyUnits = pEnemyObject.GetComponent<EnemyUnits>();
 
 		pEnemyUnits.ResetUnit(pEnemyVO);
+
+		m_OnScreenEnemyCount++;
 	}
 
 	private void RecycleAllObjects()
@@ -142,9 +151,21 @@ public class LevelController : TMonoInstanceLite<LevelController>
 		}
 	}
 
+	private void RequestChangeWeapon(int nIndex)
+	{
+		Debug.Log("RequestChangeWeapon " + nIndex);
+
+		if (LevelManager.GetInstance.CurrentLevelVO.UnlockedWeapon.IndexOf(nIndex) != -1)
+		{
+			LevelManager.GetInstance.ChangeWeapon(WeaponConfProxy.GetInstance.GetDataVO(nIndex));
+		}
+	}
+
 	public void InitializeLevel()
 	{
 		m_EnemyDictionary = new Dictionary<int, int>();
+
+		m_CurrenyEnemyCount = m_OnScreenEnemyCount = 0;
 
 		m_PlayerCoroutine = StartCoroutine(OnInitializePlayer());
 
@@ -158,6 +179,8 @@ public class LevelController : TMonoInstanceLite<LevelController>
 	public void ResetLevel()
 	{
 		m_EnemyDictionary.Clear();
+
+		m_CurrenyEnemyCount = m_OnScreenEnemyCount = 0;
 
 		if (m_PlayerCoroutine != null)
 		{
@@ -182,18 +205,44 @@ public class LevelController : TMonoInstanceLite<LevelController>
 		m_StartCountDown = true;
 	}
 
-	public void OnActiveEnemy()
-	{
-		m_CurrenyEnemyCount++;
-	}
-
 	public void OnDeactiveEnemy()
 	{
+		m_OnScreenEnemyCount--;
 		m_CurrenyEnemyCount--;
+
+		LevelManager.GetInstance.LeftEnemyCountChange(m_CurrenyEnemyCount);
 
 		if (m_CurrenyEnemyCount == 0)
 		{
 			LevelManager.GetInstance.LevelClear();
 		}
+	}
+
+	public void OnWeapon1(InputAction.CallbackContext context)
+	{
+		if (!context.started) return;
+
+		RequestChangeWeapon(1);
+	}
+
+	public void OnWeapon2(InputAction.CallbackContext context)
+	{
+		if (!context.started) return;
+
+		RequestChangeWeapon(2);
+	}
+
+	public void OnWeapon3(InputAction.CallbackContext context)
+	{
+		if (!context.started) return;
+
+		RequestChangeWeapon(3);
+	}
+
+	public void OnWeapon4(InputAction.CallbackContext context)
+	{
+		if (!context.started) return;
+
+		RequestChangeWeapon(4);
 	}
 }

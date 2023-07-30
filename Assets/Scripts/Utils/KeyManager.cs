@@ -25,7 +25,7 @@ public class KeyManager : MonoBehaviour
 			{
 				BaseCanvas pBaseCanvas = pGameObject.GetComponent<BaseCanvas>();
 
-				if (pBaseCanvas != null && pBaseCanvas.isActiveAndEnabled && pBaseCanvas.destroyWhenBackKey)
+				if (pBaseCanvas != null && pBaseCanvas.isActiveAndEnabled && pBaseCanvas.DestroyWhenBackKey)
 				{
 					pBaseCanvas.DestroyCanvas();
 				}

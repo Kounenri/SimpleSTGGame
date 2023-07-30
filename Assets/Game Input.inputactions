@@ -225,7 +225,7 @@
             "actions": [
                 {
                     "name": "Submit",
-                    "type": "Button",
+                    "type": "PassThrough",
                     "id": "22b52cb6-6455-4d17-9dda-c25d2eba389e",
                     "expectedControlType": "Button",
                     "processors": "",
@@ -234,7 +234,7 @@
                 },
                 {
                     "name": "Cancel",
-                    "type": "Button",
+                    "type": "PassThrough",
                     "id": "6993c901-3642-4627-af80-223cee369fff",
                     "expectedControlType": "Button",
                     "processors": "",
@@ -406,6 +406,94 @@
                     "processors": "",
                     "groups": "Gamepad;Joystick;Keyboard&Mouse;Touch",
                     "action": "Cancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Weapon",
+            "id": "ee4d407e-56ac-474b-b059-b263bade62f3",
+            "actions": [
+                {
+                    "name": "1",
+                    "type": "Button",
+                    "id": "27e691c6-aa63-419c-8eb5-a1549714a351",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "2",
+                    "type": "Button",
+                    "id": "9c03ceed-4478-4df8-b4fa-cd1fd227d6e4",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "3",
+                    "type": "Button",
+                    "id": "0c7f336b-cdef-4a93-af60-6d38f831c5d4",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "4",
+                    "type": "Button",
+                    "id": "28a02aaf-856e-4578-b246-21c826b1a7e8",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "e62ce7f9-6de9-42f3-8076-5bcf8540ec87",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "749b1545-c18a-4d5c-ab80-91d329027ed0",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fe0c47e0-ddb6-4989-9245-42c3622e24d7",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4e790d41-e82f-45d5-ab92-d70579477c50",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "4",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

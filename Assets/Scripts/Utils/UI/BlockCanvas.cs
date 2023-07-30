@@ -35,7 +35,7 @@ public class BlockCanvas : MonoBehaviour
 			g_Instance = this;
 
 			m_Canvas = GetComponent<Canvas>();
-			m_BlockBG = this.GetTGameObject(@"Graphic");
+			m_BlockBG = this.GetTGameObject("Graphic");
 
 			DontDestroyOnLoad(gameObject);
 

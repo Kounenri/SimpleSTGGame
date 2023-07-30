@@ -10,18 +10,17 @@ public class LevelManager : TEventDispatcher<LevelManager>, IDispatcher
 
 	public const string ON_PLAYER_HP_CHANG = "ON_PLAYER_HP_CHANG";
 
+	public const string ON_LEFT_ENEMY_COUNT_CHANGE = "ON_LEFT_ENEMY_COUNT_CHANGE";
+
 	private LevelVO m_CurrentLevelVO;
 	private WeaponVO m_CurrentWeaponVO;
-	private int m_PlayerHP = 0;
+	private bool m_IsRunning;
 
 	public LevelVO CurrentLevelVO { get { return m_CurrentLevelVO; } }
 
 	public WeaponVO CurrentWeaponVO { get { return m_CurrentWeaponVO; } }
 
-	public int PlayerHP
-	{
-		get { return m_PlayerHP; }
-	}
+	public bool IsRunning { get { return m_IsRunning; } }
 
 	protected override void OnInitialize()
 	{
@@ -37,6 +36,8 @@ public class LevelManager : TEventDispatcher<LevelManager>, IDispatcher
 	public void OnLevelLoaded()
 	{
 		LevelController.GetInstance.InitializeLevel();
+
+		m_IsRunning = true;
 	}
 
 	public void ChangeLevel(LevelVO pLevelVO)
@@ -48,11 +49,28 @@ public class LevelManager : TEventDispatcher<LevelManager>, IDispatcher
 
 	public void ResetLevel()
 	{
-		ChangeWeapon(WeaponConfProxy.GetInstance.GetDataVO(GameConfig.DEFAULT_WEAPON_ID));
+		if (!m_IsRunning)
+		{
+			ChangeWeapon(WeaponConfProxy.GetInstance.GetDataVO(GameConfig.DEFAULT_WEAPON_ID));
 
-		ChangeLevel(LevelConfProxy.GetInstance.GetDataVO(GameConfig.DEFAULT_LEVEL_ID));
+			ChangeLevel(LevelConfProxy.GetInstance.GetDataVO(GameConfig.DEFAULT_LEVEL_ID));
 
-		LevelController.GetInstance.ResetLevel();
+			LevelController.GetInstance.ResetLevel();
+
+			m_IsRunning = true;
+		}
+	}
+
+	public void NextLevel()
+	{
+		if (!m_IsRunning)
+		{
+			ChangeLevel(LevelConfProxy.GetInstance.GetDataVO(m_CurrentLevelVO.NextLevelID));
+
+			LevelController.GetInstance.ResetLevel();
+
+			m_IsRunning = true;
+		}
 	}
 
 	public void ChangeWeapon(WeaponVO pWeapon)
@@ -68,35 +86,46 @@ public class LevelManager : TEventDispatcher<LevelManager>, IDispatcher
 		DispatchEvent(ON_BULLET_COUNT_CHANGE, nCount);
 	}
 
-	public void PlayerHPChanged(int nPlayerHP)
+	public void PlayerHPChange(int nPlayerHP)
 	{
-		m_PlayerHP = nPlayerHP;
+		DispatchEvent(ON_PLAYER_HP_CHANG, nPlayerHP);
+	}
 
-		DispatchEvent(ON_PLAYER_HP_CHANG, m_PlayerHP);
+	public void LeftEnemyCountChange(int nEnemyCount)
+	{
+		DispatchEvent(ON_LEFT_ENEMY_COUNT_CHANGE, nEnemyCount);
 	}
 
 	public void LevelClear()
 	{
 		Debug.Log("LevelClear");
 
+		m_IsRunning = false;
+
 		if (m_CurrentLevelVO.NextLevelID != 0)
 		{
-
+			ResultView.Create(LevelResultEnum.LevelClear);
 		}
 		else
 		{
-
+			ResultView.Create(LevelResultEnum.AllLevelClear);
 		}
 	}
 
-	public void LevelFail(LevelFailEnum pReason)
+	public void LevelFail(LevelResultEnum pResult)
 	{
-		Debug.Log("LevelFail " + pReason.ToString());
+		Debug.Log("LevelFail " + pResult.ToString());
+
+		m_IsRunning = false;
+
+		ResultView.Create(pResult);
 	}
 }
 
-public enum LevelFailEnum
+public enum LevelResultEnum
 {
+	LevelClear,
+	AllLevelClear,
 	PlayerDead,
 	TimeOut
 }

@@ -20,6 +20,8 @@ public class BaseUnits : MonoBehaviour
 		{
 			m_CurrentHP = 0;
 
+			OnHPChange();
+
 			OnDead();
 		}
 		else

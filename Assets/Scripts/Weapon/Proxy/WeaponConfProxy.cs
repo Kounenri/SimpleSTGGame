@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine.XR;
 
 /// <summary>
 /// Load config from xml or json
@@ -96,4 +97,12 @@ public class WeaponVO : TDataVO
 	/// Destroy When Hit Enemy
 	/// </summary>
 	public bool IsPenetrable { get; set; }
+
+	public string Icon
+	{
+		get
+		{
+			return "Icon/Weapon/" + ID;
+		}
+	}
 }

@@ -1,4 +1,3 @@
-using DG.Tweening;
 using UnityEngine;
 
 public class EnemyUnits : BaseUnits
@@ -21,30 +20,11 @@ public class EnemyUnits : BaseUnits
 		m_Controller = GetComponent<EnemyController>();
 	}
 
-	private void OnEnable()
-	{
-		LevelController.GetInstance.OnActiveEnemy();
-
-		ParticleSystem pParticleSystem = GetComponentInChildren<ParticleSystem>();
-
-		if (pParticleSystem != null) pParticleSystem.Play(true);
-	}
-
 	protected override void OnDead()
 	{
 		LevelController.GetInstance.OnDeactiveEnemy();
 
 		m_Controller.OnDead();
-
-		ParticleSystem pParticleSystem = GetComponentInChildren<ParticleSystem>();
-
-		if (pParticleSystem != null) pParticleSystem.Stop(true);
-
-		// fade in to ground
-		transform.DOMoveY(-2f, 2f).SetDelay(5f).OnComplete(() =>
-		{
-			ObjectPoolManager.GetInstance.Release(gameObject);
-		});
 	}
 
 	public void ResetUnit(EnemyVO pEnemyVO)

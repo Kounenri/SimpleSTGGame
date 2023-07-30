@@ -16,11 +16,11 @@ public class LevelConfProxy : TConfProxy<LevelConfProxy, LevelVO>
 			ID = 1,
 			Name = "Level 1",
 			NextLevelID = 2,
-			EnemyOnScreen = 50,
-			InitialEnemyNumber = 50,
-			EnemyIDList = new List<int>() { 1, 2 },
-			EnemyCountList = new List<int>() { 80, 20 },
-			CountDownTime = 120
+			EnemyOnScreen = 30,
+			EnemyIDList = new List<int>() { 1 },
+			EnemyCountList = new List<int>() { 50 },
+			UnlockedWeapon = new List<int> { 1 },
+			CountDownTime = 100,
 		});
 
 		m_DataVODictionary.Add(2, new LevelVO()
@@ -28,23 +28,23 @@ public class LevelConfProxy : TConfProxy<LevelConfProxy, LevelVO>
 			ID = 2,
 			Name = "Level 2",
 			NextLevelID = 3,
-			EnemyOnScreen = 100,
-			InitialEnemyNumber = 50,
+			EnemyOnScreen = 50,
 			EnemyIDList = new List<int>() { 1, 2 },
-			EnemyCountList = new List<int>() { 160, 40 },
-			CountDownTime = 240
+			EnemyCountList = new List<int>() { 80, 20 },
+			UnlockedWeapon = new List<int> { 1 },
+			CountDownTime = 120,
 		});
 
 		m_DataVODictionary.Add(3, new LevelVO()
 		{
-			ID = 3,
+			ID = 4,
 			Name = "Level 3",
-			NextLevelID = 4,
-			EnemyOnScreen = 200,
-			InitialEnemyNumber = 50,
-			EnemyIDList = new List<int>() { 1, 2, 3 },
-			EnemyCountList = new List<int>() { 200, 80, 20 },
-			CountDownTime = 360
+			NextLevelID = 5,
+			EnemyOnScreen = 100,
+			EnemyIDList = new List<int>() { 1, 2 },
+			EnemyCountList = new List<int>() { 160, 40 },
+			UnlockedWeapon = new List<int> { 1, 2 },
+			CountDownTime = 240
 		});
 
 		m_DataVODictionary.Add(4, new LevelVO()
@@ -53,21 +53,33 @@ public class LevelConfProxy : TConfProxy<LevelConfProxy, LevelVO>
 			Name = "Level 4",
 			NextLevelID = 5,
 			EnemyOnScreen = 200,
-			InitialEnemyNumber = 80,
 			EnemyIDList = new List<int>() { 1, 2, 3 },
-			EnemyCountList = new List<int>() { 80, 200, 20 },
+			EnemyCountList = new List<int>() { 200, 80, 20 },
+			UnlockedWeapon = new List<int> { 1, 2, 3 },
 			CountDownTime = 360
 		});
 
 		m_DataVODictionary.Add(5, new LevelVO()
 		{
 			ID = 5,
+			Name = "Level 5",
+			NextLevelID = 6,
+			EnemyOnScreen = 200,
+			EnemyIDList = new List<int>() { 1, 2, 3 },
+			EnemyCountList = new List<int>() { 80, 200, 20 },
+			UnlockedWeapon = new List<int> { 1, 2, 3, 4 },
+			CountDownTime = 360
+		});
+
+		m_DataVODictionary.Add(6, new LevelVO()
+		{
+			ID = 6,
 			Name = "Final Level",
 			NextLevelID = 0,
 			EnemyOnScreen = 200,
-			InitialEnemyNumber = 100,
 			EnemyIDList = new List<int>() { 2, 3 },
 			EnemyCountList = new List<int>() { 80, 120 },
+			UnlockedWeapon = new List<int> { 1, 2, 3, 4 },
 			CountDownTime = 360
 		});
 	}
@@ -75,17 +87,38 @@ public class LevelConfProxy : TConfProxy<LevelConfProxy, LevelVO>
 
 public class LevelVO : TDataVO
 {
+	/// <summary>
+	/// Level Name
+	/// </summary>
 	public string Name { get; set; }
 
+	/// <summary>
+	/// Next Level ID
+	/// </summary>
 	public int NextLevelID { get; set; }
 
+	/// <summary>
+	/// Number Of Enemies At Time
+	/// </summary>
 	public int EnemyOnScreen { get; set; }
 
-	public int InitialEnemyNumber { get; set; }
-
+	/// <summary>
+	/// Enemy IDs That Appear
+	/// </summary>
 	public List<int> EnemyIDList { get; set; }
 
+	/// <summary>
+	/// Enemy Count That Appear
+	/// </summary>
 	public List<int> EnemyCountList { get; set; }
 
+	/// <summary>
+	/// Player Can Used Weapon
+	/// </summary>
+	public List<int> UnlockedWeapon { get; set; }
+
+	/// <summary>
+	/// Countdown To Failure
+	/// </summary>
 	public int CountDownTime { get; set; }
 }

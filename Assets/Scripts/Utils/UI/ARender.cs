@@ -6,47 +6,47 @@ public class ARender : MonoBehaviour, IPointerClickHandler
 	[SerializeField]
 	protected bool m_UpdateSelectRender = false;
 
-	private int m_nRenderOrder = 0;
-	private object m_pData;
-	private float m_fDisableRenderDuration = 2f;
-	private bool m_bInvalidate = false;
+	private int m_RenderOrder = 0;
+	private object m_Data;
+	private float m_DisableRenderDuration = 2f;
+	private bool m_Invalidate = false;
 
-	public float disableRenderDuration
+	public float DisableRenderDuration
 	{
 		get
 		{
-			return m_fDisableRenderDuration;
+			return m_DisableRenderDuration;
 		}
 		set
 		{
-			m_fDisableRenderDuration = value;
+			m_DisableRenderDuration = value;
 		}
 	}
 
-	public bool disableRender
+	public bool DisableRender
 	{
 		get
 		{
-			return transform.Find(@"DisableRender") != null;
+			return transform.Find("DisableRender") != null;
 		}
 		set
 		{
-			Transform pTransform = transform.Find(@"DisableRender");
+			Transform pTransform = transform.Find("DisableRender");
 
 			if (value)
 			{
 				if (pTransform == null)
 				{
-					GameObject pPrefab = Resources.Load<GameObject>(@"ui/DisableRender");
-					GameObject pGameObject = Instantiate(pPrefab) as GameObject;
+					GameObject pPrefab = Resources.Load<GameObject>("UI/DisableRender");
+					GameObject pGameObject = Instantiate(pPrefab);
 					pGameObject.name = @"DisableRender";
 					pGameObject.transform.SetParent(transform, false);
-					pGameObject.GetComponent<DisableRender>().Duration = m_fDisableRenderDuration;
+					pGameObject.GetComponent<DisableRender>().Duration = m_DisableRenderDuration;
 				}
 				else
 				{
 					DisableRender pDisableRender = pTransform.GetComponent<DisableRender>();
-					pDisableRender.Duration = m_fDisableRenderDuration;
+					pDisableRender.Duration = m_DisableRenderDuration;
 				}
 			}
 			else
@@ -60,69 +60,58 @@ public class ARender : MonoBehaviour, IPointerClickHandler
 		}
 	}
 
-	public bool invalidate
+	public bool Invalidate
 	{
 		get
 		{
-			return m_bInvalidate;
+			return m_Invalidate;
 		}
 		set
 		{
-			m_bInvalidate = value;
+			m_Invalidate = value;
 		}
 	}
 
-	public int renderOrder
+	public int RenderOrder
 	{
 		get
 		{
-			return m_nRenderOrder;
+			return m_RenderOrder;
 		}
 		set
 		{
-			m_nRenderOrder = value;
+			m_RenderOrder = value;
 		}
 	}
 
-	void Update()
+	private void Update()
 	{
-		if (m_bInvalidate)
+		if (m_Invalidate)
 		{
-			m_bInvalidate = false;
+			m_Invalidate = false;
 
 			RefreshView();
 		}
 	}
 
-	public object data
+	public object Data
 	{
 		set
 		{
-			m_pData = value;
-			setFontSize();
+			m_Data = value;
 
 			OnSetData();
 		}
 		get
 		{
-			return m_pData;
+			return m_Data;
 		}
 	}
 
 	protected virtual void OnSetData()
 	{
-		m_bInvalidate = true;
-
-
+		m_Invalidate = true;
 	}
-
-	bool _haveSetFontSize = false;
-	void setFontSize()
-	{
-		if (_haveSetFontSize) return;
-		_haveSetFontSize = true;
-	}
-
 
 	protected virtual void RefreshView()
 	{
@@ -132,16 +121,16 @@ public class ARender : MonoBehaviour, IPointerClickHandler
 	public virtual void OnClickRender(Vector3 pClickPosition)
 	{
 #if UNITY_EDITOR
-		Debug.Log(@"Render Click");
+		Debug.Log("Render Click");
 
-		if (data != null)
+		if (Data != null)
 		{
-			Debug.Log(@"Data Type : " + data.ToString());
+			Debug.Log("Data Type : " + Data.ToString());
 
-			//if(data is TDataVO)
-			//{
-			//	Debug.Log(@"Data ID : " + (data as TDataVO).ID);
-			//}
+			if (Data is TDataVO)
+			{
+				Debug.Log("Data ID : " + (Data as TDataVO).ID);
+			}
 		}
 #endif
 	}
@@ -158,7 +147,7 @@ public class ARender : MonoBehaviour, IPointerClickHandler
 	{
 		SimpleVList pSimpleVList = transform.GetComponentInParent<SimpleVList>();
 
-		if (pSimpleVList != null && pSimpleVList.reuseRenders)
+		if (pSimpleVList != null && pSimpleVList.ReuseRenders)
 		{
 			pSimpleVList.RecycleRender(gameObject);
 		}
@@ -170,13 +159,13 @@ public class ARender : MonoBehaviour, IPointerClickHandler
 
 	void IPointerClickHandler.OnPointerClick(PointerEventData pPointerEventData)
 	{
-		if (!disableRender)
+		if (!DisableRender)
 		{
 			OnClickRender(pPointerEventData.position);
 
 			if (m_UpdateSelectRender && transform.parent.GetComponent<SimpleVList>() != null)
 			{
-				transform.parent.GetComponent<SimpleVList>().refreshSelectedRender(gameObject);
+				transform.parent.GetComponent<SimpleVList>().RefreshSelectedRender(gameObject);
 			}
 		}
 	}

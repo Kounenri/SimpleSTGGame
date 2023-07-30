@@ -55,14 +55,14 @@ public class PlayerUnits : BaseUnits
 	{
 		base.OnHPChange();
 
-		LevelManager.GetInstance.PlayerHPChanged(m_CurrentHP);
+		LevelManager.GetInstance.PlayerHPChange(m_CurrentHP);
 	}
 
 	protected override void OnDead()
 	{
 		m_Controller.OnDead();
 
-		LevelManager.GetInstance.LevelFail(LevelFailEnum.PlayerDead);
+		LevelManager.GetInstance.LevelFail(LevelResultEnum.PlayerDead);
 	}
 
 	public void ResetUnit()

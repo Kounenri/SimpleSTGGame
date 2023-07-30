@@ -18,7 +18,7 @@ TagManager:
   - BlockUI
   - GlobalCanvas
   - Particle
-  - ClickMask
+  - 
   - 
   - 
   - 
@@ -47,9 +47,6 @@ TagManager:
     locked: 0
   - name: BlockUI
     uniqueID: 276005069
-    locked: 0
-  - name: ClickMask
-    uniqueID: 3745745367
     locked: 0
   - name: UI
     uniqueID: 3263541109

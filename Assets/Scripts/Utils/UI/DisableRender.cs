@@ -2,25 +2,25 @@
 
 public class DisableRender : MonoBehaviour
 {
-	private float m_fDuration = 2f;
-	private float m_fStartTime = 0;
+	private float m_Duration = 2f;
+	private float m_StartTime = 0;
 
 	public float Duration
 	{
 		get
 		{
-			return m_fDuration;
+			return m_Duration;
 		}
 		set
 		{
-			m_fDuration = value;
-			m_fStartTime = Time.time;
+			m_Duration = value;
+			m_StartTime = Time.time;
 		}
 	}
 
-	void Update()
+	private void Update()
 	{
-		if(Time.time - m_fStartTime >= m_fDuration)
+		if (Time.time - m_StartTime >= m_Duration)
 		{
 			OnEnd();
 		}

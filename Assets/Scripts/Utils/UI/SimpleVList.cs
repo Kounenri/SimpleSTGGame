@@ -1,329 +1,146 @@
-using DG.Tweening;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class SimpleVList : MonoBehaviour
 {
-	public GameObject emptyPanel;
-	public GameObject renderPrefab;
-	public bool reuseRenders = true;
-	protected bool _needRefreshView = false;
-	protected List<System.Object> _dataProvider = null;
-	protected bool _hasDoneRefresh;
+	[SerializeField]
+	private GameObject m_RenderPrefab;
+	[SerializeField]
+	private bool m_ReuseRenders = true;
+	[SerializeField]
+	private bool m_ClearRendersWhenAwake = true;
 
-	public virtual List<System.Object> dataProvider
+	protected GameObject m_SelectedRender = null;
+	protected bool m_NeedRefreshView = false;
+	protected List<object> m_DataProvider = null;
+	protected List<GameObject> m_ReuseRenderList = new();
+	protected bool m_HasDoneRefresh;
+
+	public Action<GameObject> OnSelectRenderHandler = null;
+
+	public virtual List<object> DataProvider
 	{
 		get
 		{
-			return _dataProvider;
+			return m_DataProvider;
 		}
 		set
 		{
-			_dataProvider = value;
-			_needRefreshView = true;
-			_hasDoneRefresh = false;
-			if (emptyPanel != null)
-			{
-				if (_dataProvider == null || _dataProvider.Count == 0)
-					emptyPanel.SetActive(true);
-				else
-					emptyPanel.SetActive(false);
-			}
-			PlayShowTween();
-
+			m_DataProvider = value;
+			m_NeedRefreshView = true;
+			m_HasDoneRefresh = false;
 		}
 	}
 
-	public bool hasData
+	public bool HasData
 	{
 		get
 		{
-			return _dataProvider != null && _dataProvider.Count > 0;
+			return m_DataProvider != null && m_DataProvider.Count > 0;
 		}
 	}
 
-	public bool hasDoneRefresh
+	public bool HasDoneRefresh
 	{
 		get
 		{
-			return _hasDoneRefresh;
+			return m_HasDoneRefresh;
 		}
 	}
 
-	public bool clearRendersWhenAwake = true;
-	void Awake()
+	public bool ReuseRenders
 	{
-		if (clearRendersWhenAwake)
+		get
 		{
-			foreach (Transform childTransform in this.transform)
+			return m_ReuseRenders;
+		}
+	}
+
+	private void Awake()
+	{
+		if (m_ClearRendersWhenAwake)
+		{
+			foreach (Transform pChildTransform in transform)
 			{
-				if (childTransform.GetComponent<ARender>() != null)
-					Destroy(childTransform.gameObject);
-			}
-		}
-
-		onInit();
-	}
-
-
-	protected virtual void onInit()
-	{
-
-	}
-
-	/*
-	private bool _isDown = false;
-	private bool _isDrag = false;
-	private Vector3 _startPos = new Vector3();
-	void Update()
-	{
-		if(Input.GetMouseButtonDown(0))
-		{
-
-			_isDrag = false;
-			Ray ray = UICamera.Instance.camera.ScreenPointToRay (Input.mousePosition);
-			RaycastHit2D hit = Physics2D.GetRayIntersection (ray);
-			if ( hit.collider != null) {
-				if (hit.collider.GetComponent<ARender>()!=null)
+				if (pChildTransform.GetComponent<ARender>() != null)
 				{
-					_startPos = Input.mousePosition;
-					_isDown = true;
+					Destroy(pChildTransform.gameObject);
 				}
 			}
 		}
 
-		if(_isDown)
+		OnInit();
+	}
+
+	private void LateUpdate()
+	{
+		if (m_NeedRefreshView)
 		{
-			if(Vector3.Distance(Input.mousePosition,_startPos)>15f)
+			RefreshView();
+
+			m_NeedRefreshView = false;
+		}
+	}
+
+	protected virtual void OnInit()
+	{
+	}
+
+	protected virtual GameObject GetRenderPrefab(object pDataVO)
+	{
+		return m_RenderPrefab;
+	}
+
+	public void RefreshSelectedRender(GameObject pRenderObject)
+	{
+		foreach (Transform pChildTransform in transform)
+		{
+			if (pChildTransform.gameObject.activeSelf == false || pChildTransform.GetComponent<ARender>() == null) continue;
+
+			if (pRenderObject == pChildTransform.gameObject)
 			{
-				_isDrag = true;
-			}
-		}
-
-		if(Input.GetMouseButtonUp(0))
-		{
-			Ray ray = UICamera.Instance.camera.ScreenPointToRay (Input.mousePosition);
-			RaycastHit2D hit = Physics2D.GetRayIntersection (ray);
-			if ( hit.collider != null) {
-				if (hit.collider.GetComponent<ARender>()!=null && _isDrag == false)
-				{
-					SendMessageUpwards("onClickRender",hit.collider.gameObject,SendMessageOptions.DontRequireReceiver);
-					hit.collider.GetComponent<ARender>().onClick();
-					refreshSelectedRender(hit.collider.gameObject);
-					DebugUtil.Log("click render");
-				}
-			}
-			_isDrag = false;
-		}
-	}
-    */
-
-	protected enum ShowType
-	{
-		None,
-		MoveSize,
-		FillMount
-	}
-
-	[SerializeField] protected ShowType isPlayListShow = ShowType.None;
-	public bool isLoopShowList = false;
-	[SerializeField] protected float ShowTime = 0f;
-	[SerializeField] protected float ShowSpeed = 0.2f;
-	private ScrollRect m_scroll;
-	private RectTransform m_viewport;
-	private CanvasGroup m_canvas;
-	protected virtual void PlayShowTween()
-	{
-		if (isPlayListShow != ShowType.None || isLoopShowList)
-		{
-			m_scroll = transform.GetComponentInParent<ScrollRect>();
-			if (m_scroll == null && transform.parent != null && transform.parent.parent != null)
-				m_scroll = transform.parent.parent.GetComponent<ScrollRect>();
-
-			if (m_scroll != null && m_scroll.viewport != null)
-			{
-				if (m_scroll.viewport.GetComponent<Mask>() != null)
-				{
-					m_viewport = m_scroll.viewport;
-					m_canvas = m_scroll.viewport.GetComponent<CanvasGroup>() ? m_scroll.viewport.gameObject.GetComponent<CanvasGroup>() : m_scroll.viewport.gameObject.AddComponent<CanvasGroup>();
-					m_canvas.alpha = 0;
-					m_canvas.blocksRaycasts = false;
-
-					Invoke("DoPlay", ShowTime);
-				}
-				else
-				{
-					if (m_scroll.GetComponent<Mask>() != null)
-					{
-						m_viewport = m_scroll.GetComponent<RectTransform>();
-						m_canvas = m_scroll.GetComponent<CanvasGroup>() ? m_scroll.gameObject.GetComponent<CanvasGroup>() : m_scroll.gameObject.AddComponent<CanvasGroup>();
-						m_canvas.alpha = 0;
-						m_canvas.blocksRaycasts = false;
-
-						Invoke("DoPlay", ShowTime);
-					}
-				}
-
-
+				pChildTransform.GetComponent<ARender>().OnSelect();
+				m_SelectedRender = pChildTransform.gameObject;
 			}
 			else
 			{
-				if (!isLoopShowList)
-					isPlayListShow = ShowType.None;
-			}
-
-
-		}
-	}
-
-	private void DoPlay()
-	{
-		switch (isPlayListShow)
-		{
-			case ShowType.None:
-				break;
-			case ShowType.MoveSize:
-				{
-					bool IsVisibility = false;
-					m_canvas.DOFade(1, ShowSpeed).SetEase(Ease.Linear).OnComplete(() => { m_canvas.blocksRaycasts = true; });
-					if (m_scroll.vertical)
-					{
-						if (m_scroll.verticalScrollbarVisibility == ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport)
-						{
-							m_scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
-							IsVisibility = true;
-						}
-						float baseY = -m_scroll.GetComponent<RectTransform>().rect.height;
-						Vector2 thisVer = m_viewport.sizeDelta;
-						m_viewport.sizeDelta = new Vector2(thisVer.x, baseY);
-						m_viewport.DOSizeDelta(thisVer, ShowSpeed).SetEase(Ease.Linear).OnComplete(() =>
-						{
-
-							if (IsVisibility)
-							{
-								m_scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport;
-							}
-						});
-
-
-					}
-					if (m_scroll.horizontal)
-					{
-						if (m_scroll.horizontalScrollbarVisibility == ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport)
-						{
-							m_scroll.horizontalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
-							IsVisibility = true;
-						}
-						float baseX = -m_scroll.GetComponent<RectTransform>().rect.width;
-						Vector2 thisVer = m_viewport.sizeDelta;
-						m_viewport.sizeDelta = new Vector2(baseX, thisVer.y);
-						m_viewport.DOSizeDelta(thisVer, ShowSpeed).SetEase(Ease.Linear).OnComplete(() =>
-						{
-							if (IsVisibility)
-							{
-								m_scroll.horizontalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport;
-							}
-						});
-					}
-
-				}
-				break;
-			case ShowType.FillMount:
-				{
-					m_canvas.DOFade(1, ShowSpeed).SetEase(Ease.Linear).OnComplete(() => { m_canvas.blocksRaycasts = true; });
-					if (m_scroll.vertical)
-					{
-						Image tmpImage = m_viewport.transform.GetComponent<Image>() ? m_viewport.gameObject.GetComponent<Image>() : m_viewport.gameObject.AddComponent<Image>();
-						tmpImage.type = Image.Type.Filled;
-						tmpImage.fillMethod = Image.FillMethod.Vertical;
-						tmpImage.fillOrigin = (int)Image.OriginVertical.Top;
-						tmpImage.fillAmount = 0;
-						tmpImage.DOFillAmount(1, ShowSpeed);
-					}
-					else if (m_scroll.horizontal)
-					{
-						Image tmpImage = m_viewport.transform.GetComponent<Image>() ? m_viewport.gameObject.GetComponent<Image>() : m_viewport.gameObject.AddComponent<Image>();
-						tmpImage.type = Image.Type.Filled;
-						tmpImage.fillMethod = Image.FillMethod.Horizontal;
-						tmpImage.fillOrigin = (int)Image.OriginHorizontal.Left;
-						tmpImage.fillAmount = 0;
-						tmpImage.DOFillAmount(1, ShowSpeed);
-					}
-
-				}
-				break;
-			default:
-				break;
-		}
-
-		if (!isLoopShowList)
-			isPlayListShow = ShowType.None;
-
-	}
-
-	protected virtual GameObject getRenderPrefab(System.Object vo)
-	{
-		return renderPrefab;
-	}
-
-	protected GameObject _selectedRender = null;
-
-	public void refreshSelectedRender(GameObject render)
-	{
-		_selectedRender = null;
-		foreach (Transform childTransform in this.transform)
-		{
-			if (childTransform.gameObject.activeSelf == false || childTransform.GetComponent<ARender>() == null)
-				continue;
-
-			if (render == childTransform.gameObject)
-			{
-				childTransform.GetComponent<ARender>().OnSelect();
-				_selectedRender = childTransform.gameObject;
-			}
-			else
-			{
-				childTransform.GetComponent<ARender>().OnDisSelect();
+				pChildTransform.GetComponent<ARender>().OnDisSelect();
 			}
 		}
 
-		if (onSelectRenderHandler != null)
-		{
-			onSelectRenderHandler(_selectedRender);
-		}
+		OnSelectRenderHandler?.Invoke(m_SelectedRender);
 	}
 
-	public Action<GameObject> onSelectRenderHandler = null;
-
-	public Vector2 getRenderSize()
+	public Vector2 GetRenderSize()
 	{
-		ARender r = this.GetComponentInChildren<ARender>();
-		if (r != null && r.gameObject.activeSelf)
+		ARender pARender = GetComponentInChildren<ARender>();
+
+		if (pARender != null && pARender.gameObject.activeSelf)
 		{
-			return new Vector2(r.GetComponent<RectTransform>().rect.width, r.GetComponent<RectTransform>().rect.height);
+			var pRectTransform = pARender.GetComponent<RectTransform>();
+
+			return new Vector2(pRectTransform.rect.width, pRectTransform.rect.height);
 		}
 		return new Vector2();
 	}
 
-	public Vector2 getRenderSize(int dex)
+	public Vector2 GetRenderSize(int nIndex)
 	{
-		GameObject obj = getRender(dex);
-		if (obj != null)
-		{
+		GameObject pGameObject = GetRender(nIndex);
 
-			return obj.GetComponent<RectTransform>().sizeDelta;
+		if (pGameObject != null)
+		{
+			return pGameObject.GetComponent<RectTransform>().sizeDelta;
 		}
 
 		return new Vector2();
 	}
 
-	public Vector2 getRenderPos(int dex)
+	public Vector2 GetRenderPos(int nIndex)
 	{
 
-		GameObject obj = getRender(dex);
+		GameObject obj = GetRender(nIndex);
 		if (obj != null)
 		{
 
@@ -334,36 +151,32 @@ public class SimpleVList : MonoBehaviour
 
 	}
 
-	public GameObject getRender(int dex)
+	public GameObject GetRender(int nIndex)
 	{
-		if (dex >= transform.childCount)
+		if (nIndex >= transform.childCount)
 			return null;
 
-		GameObject obj = transform.GetChild(dex).gameObject;
+		GameObject obj = transform.GetChild(nIndex).gameObject;
 		if (obj.activeSelf == false || obj.GetComponent<ARender>() == null)
 		{
-			return getRender(dex + 1);
+			return GetRender(nIndex + 1);
 		}
 		return obj;
 	}
 
-	public object getRenderDate(int dex)
+	public object GetRenderData(int nIndex)
 	{
-		GameObject render = getRender(dex);
-		if (render != null)
-		{
-			ARender arend = render.GetComponent<ARender>();
-			return arend.data;
-		}
-		else
+		if (nIndex >= transform.childCount)
 		{
 			return null;
 		}
+
+		return GetRender(nIndex).GetComponent<ARender>().Data;
 	}
 
 	public List<Transform> GetChildList()
 	{
-		List<Transform> pList = new List<Transform>();
+		List<Transform> pList = new();
 
 		for (int i = 0; i < transform.childCount; i++)
 		{
@@ -378,128 +191,77 @@ public class SimpleVList : MonoBehaviour
 		return pList;
 	}
 
-	/// <summary>
-	/// 避免用上面那个list 多次 GetComponent
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <returns></returns>
-	public List<T> GetChildList<T>() where T : ARender
+	public int GetRenderNum()
 	{
-		List<T> pList = new List<T>();
-
-		for (int i = 0; i < transform.childCount; i++)
-		{
-			Transform pTransform = transform.GetChild(i);
-			var tmp = pTransform.GetComponent<T>();
-			if (pTransform.gameObject.activeSelf && tmp != null)
-			{
-				pList.Add(tmp);
-			}
-		}
-		return pList;
-	}
-
-	public int getRenderNum()
-	{
-		int res = 0;
+		int nResult = 0;
 		for (int i = 0; i < transform.childCount; i++)
 		{
 			if (transform.GetChild(i).gameObject.activeSelf == true && transform.GetChild(i).GetComponent<ARender>() != null)
 			{
-				res++;
+				nResult++;
 			}
 		}
-		return res;
+		return nResult;
 	}
 
-	public GameObject getSelectedRender()
+	public GameObject GetSelectedRender()
 	{
-		return _selectedRender;
+		return m_SelectedRender;
 	}
 
-	void LateUpdate()
+	protected virtual void RefreshView()
 	{
-		if (_needRefreshView)
+		m_SelectedRender = null;
+
+		foreach (Transform pChildTransform in transform)
 		{
-			refreshView();
-			_needRefreshView = false;
-		}
-	}
-
-	protected virtual void refreshView()
-	{
-
-		_selectedRender = null;
-
-		foreach (Transform childTransform in this.transform)
-		{
-			ARender temp = childTransform.GetComponent<ARender>();
-			if (temp != null)
+			ARender pARender = pChildTransform.GetComponent<ARender>();
+			if (pARender != null)
 			{
-				if (reuseRenders)
+				if (m_ReuseRenders)
 				{
-
-					RecycleRender(childTransform.gameObject);
+					RecycleRender(pChildTransform.gameObject);
 				}
 				else
 				{
-					Destroy(childTransform.gameObject);
+					Destroy(pChildTransform.gameObject);
 				}
 			}
 		}
 
-		if (_dataProvider == null)
+		if (m_DataProvider == null) return;
+
+		for (int i = 0; i < m_DataProvider.Count; i++)
 		{
-			return;
-		}
-		//int startSiblingDex = transform.childCount;
-		for (int i = 0; i < _dataProvider.Count; i++)
-		{
-			GameObject obj = createRender(_dataProvider[i], i);
-			obj.GetComponent<ARender>().renderOrder = i;
-			obj.transform.SetSiblingIndex(transform.childCount);
+			GameObject pRenderObject = CreateRender(m_DataProvider[i], i);
+			pRenderObject.GetComponent<ARender>().RenderOrder = i;
+			pRenderObject.transform.SetSiblingIndex(transform.childCount);
 		}
 
 		AdjustSibling();
 
-		_hasDoneRefresh = true;
+		m_HasDoneRefresh = true;
 	}
 
-	private List<GameObject> _reuseRenderList = new List<GameObject>();
-	/// <summary>
-	/// 是否顺序渲染 解决数据刷新时闪屏问题。
-	/// </summary>
-	public bool isOrderRender;
-
-	protected GameObject getReuseRender()
+	protected GameObject GetReuseRender()
 	{
-		int count = _reuseRenderList.Count;
+		int nCount = m_ReuseRenderList.Count;
 
-		if (count <= 0)
-			return null;
+		if (nCount <= 0) return null;
 
-		if (isOrderRender)
+		GameObject pRenderObject = m_ReuseRenderList[nCount - 1];
+
+		if (pRenderObject.GetComponent<ARender>() == null)
 		{
-			GameObject tmp = _reuseRenderList.First();
-			if (tmp.GetComponent<ARender>() == null)
-			{
-				_reuseRenderList.RemoveAt(0);
-				return getReuseRender();
-			}
-			_reuseRenderList.RemoveAt(0);
-			tmp.SetActive(true);
-			return tmp;
-		}
-
-		GameObject obj = _reuseRenderList[count - 1];
-		if (obj.GetComponent<ARender>() == null)
-		{
-			_reuseRenderList.Remove(obj);
+			m_ReuseRenderList.Remove(pRenderObject);
 			return null;
 		}
-		_reuseRenderList.RemoveAt(count - 1);
-		obj.SetActive(true);
-		return obj;
+
+		m_ReuseRenderList.RemoveAt(nCount - 1);
+
+		pRenderObject.SetActive(true);
+
+		return pRenderObject;
 	}
 
 	public void RecycleRender(GameObject pRender)
@@ -510,165 +272,128 @@ public class SimpleVList : MonoBehaviour
 		{
 			pRender.SetActive(false);
 
-			if (_reuseRenderList.IndexOf(pRender) == -1)
-				_reuseRenderList.Add(pRender);
-
-			ARender[] aRenders = transform.GetComponentsInChildren<ARender>();
-
-			for (int i = 0; i < aRenders.Length; i++)
+			if (m_ReuseRenderList.IndexOf(pRender) == -1)
 			{
-				aRenders[i].renderOrder = i;
+				m_ReuseRenderList.Add(pRender);
 			}
 		}
 	}
 
-	protected virtual GameObject createRender(object pData, int nIndex = 0, int siblingIndex = -1)
+	protected virtual GameObject CreateRender(object pData, int nIndex = 0, int nSiblingIndex = -1)
 	{
-
-		GameObject obj = getReuseRender();
-		if (obj == null)
+		GameObject pRenderObject = GetReuseRender();
+		if (pRenderObject == null)
 		{
-			obj = Instantiate(getRenderPrefab(pData)) as GameObject;
-			obj.GetComponent<RectTransform>().SetParent(gameObject.GetComponent<RectTransform>(), false);
-			if (siblingIndex >= 0) obj.transform.SetSiblingIndex(nIndex);
+			pRenderObject = Instantiate(GetRenderPrefab(pData));
+			pRenderObject.GetComponent<RectTransform>().SetParent(gameObject.GetComponent<RectTransform>(), false);
+			if (nSiblingIndex >= 0) pRenderObject.transform.SetSiblingIndex(nIndex);
 		}
 
-		ARender render = obj.GetComponent<ARender>();
-
-		if (render != null)
+		if (pRenderObject.TryGetComponent<ARender>(out var pARender))
 		{
-			render.renderOrder = nIndex;
-			render.data = pData;
+			pARender.RenderOrder = nIndex;
+			pARender.Data = pData;
 		}
 
-		return obj;
+		return pRenderObject;
 	}
 
-	void AdjustSibling()
+	private void AdjustSibling()
 	{
-		int len = transform.childCount;
-		for (int i = 0; i < len; i++)
+		foreach (Transform pChildTransform in transform)
 		{
-			KeepRenderSibling r = transform.GetChild(i).GetComponent<KeepRenderSibling>();
-			if (r != null)
+			if (pChildTransform.TryGetComponent<KeepRenderSibling>(out var pKeepRenderSibling))
 			{
-				if (r.KeepInFirst)
+				if (pKeepRenderSibling.KeepInFirst)
 				{
-					r.GetComponent<RectTransform>().SetAsFirstSibling();
+					pKeepRenderSibling.GetComponent<RectTransform>().SetAsFirstSibling();
 				}
 				else
 				{
-					r.GetComponent<RectTransform>().SetAsLastSibling();
+					pKeepRenderSibling.GetComponent<RectTransform>().SetAsLastSibling();
 				}
 			}
 		}
 	}
 
-	public void addData(System.Object data, bool insertToLast = true)
+	public void AddData(object pData, bool bInsertToLast = true)
 	{
-		List<System.Object> arr = new List<object>() { data };
-		if (insertToLast)
+		List<object> pList = new() { pData };
+
+		if (bInsertToLast)
 		{
-			insertLast(arr);
+			InsertLast(pList);
 		}
 		else
 		{
-			insertFirst(arr);
+			InsertFirst(pList);
 		}
 	}
 
-	public void insert(List<System.Object> arr, int dex)
+	public void Insert(List<object> pList, int nIndex)
 	{
-		if (_dataProvider == null)
-			_dataProvider = new List<object>();
+		m_DataProvider ??= new List<object>();
 
+		m_DataProvider.InsertRange(nIndex, pList);
 
-
-		_dataProvider.InsertRange(dex, arr);
-
-		int len = arr.Count;
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < pList.Count; i++)
 		{
-			GameObject render = createRender(arr[i]);
+			GameObject pRender = CreateRender(pList[i]);
 
-			render.GetComponent<RectTransform>().SetSiblingIndex(dex + i);
+			pRender.GetComponent<RectTransform>().SetSiblingIndex(nIndex + i);
 		}
 
 		AdjustSibling();
 	}
 
-
-
-
-	public void insertLast(List<System.Object> arr)
+	public void InsertLast(List<object> pList)
 	{
+		m_DataProvider ??= new List<object>();
 
-		if (_dataProvider == null)
-			_dataProvider = new List<object>();
+		m_DataProvider.InsertRange(m_DataProvider.Count, pList);
 
-		_dataProvider.InsertRange(_dataProvider.Count, arr);
-
-		int len = arr.Count;
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < pList.Count; i++)
 		{
-			GameObject render = createRender(arr[i]);
+			GameObject pRender = CreateRender(pList[i]);
 
-			render.GetComponent<RectTransform>().SetSiblingIndex(render.transform.parent.childCount - 1);
+			pRender.GetComponent<RectTransform>().SetSiblingIndex(pRender.transform.parent.childCount - 1);
 		}
 
 		AdjustSibling();
 	}
 
-	public void insertFirst(List<System.Object> arr)
+	public void InsertFirst(List<object> pList)
 	{
-		if (_dataProvider == null)
-			_dataProvider = new List<object>();
-		_dataProvider.InsertRange(0, arr);
+		m_DataProvider ??= new List<object>();
 
-		int len = arr.Count;
-		for (int i = 0; i < len; i++)
+		m_DataProvider.InsertRange(0, pList);
+
+		for (int i = 0; i < pList.Count; i++)
 		{
-			GameObject render = createRender(arr[i]);
+			GameObject pRender = CreateRender(pList[i]);
 
-			render.GetComponent<RectTransform>().SetSiblingIndex(i);
+			pRender.GetComponent<RectTransform>().SetSiblingIndex(i);
 		}
 
 		AdjustSibling();
 	}
 
-
-	public void removeData(object data)
+	public void RemoveData(object pData)
 	{
+		List<Transform> pRenders = GetChildList();
 
-		if (data == null)
+		Transform pTransform = pRenders.Find((p) => { return p.GetComponent<ARender>().Data == pData; });
+
+		if (pTransform != null)
 		{
-			Debug.LogError("不能删除data为null的render");
+			Destroy(pTransform.gameObject);
 		}
 
-		List<Transform> renders = GetChildList();
-		Transform r = renders.Find((p) => { return p.GetComponent<ARender>().data == data; });
-
-		if (r != null)
+		int nIndex = m_DataProvider.FindIndex((p) =>
 		{
-			Destroy(r.gameObject);
-		}
-
-		int dex = _dataProvider.FindIndex((p) =>
-		{
-
-
-			if (data == p) return true;
-
-			return false;
+			return pData == p;
 		});
 
-		if (dex >= 0) _dataProvider.RemoveAt(dex);
-
-	}
-
-
-	void OnDestroy()
-	{
-		_reuseRenderList = new List<GameObject>();
+		if (nIndex >= 0) m_DataProvider.RemoveAt(nIndex);
 	}
 }

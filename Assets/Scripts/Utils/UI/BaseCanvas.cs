@@ -1,7 +1,6 @@
-﻿using UnityEngine;
+﻿using DG.Tweening;
+using UnityEngine;
 using UnityEngine.UI;
-using DG.Tweening;
-using System.Collections.Generic;
 
 [RequireComponent(typeof(Canvas))]
 [RequireComponent(typeof(GraphicRaycaster))]
@@ -46,7 +45,7 @@ public class BaseCanvas : MonoBehaviour
 			return m_CanvasType;
 		}
 	}
-	public bool delayShow
+	public bool DelayShow
 	{
 		get
 		{
@@ -58,7 +57,7 @@ public class BaseCanvas : MonoBehaviour
 		}
 	}
 
-	public bool destroyWhenBackKey
+	public bool DestroyWhenBackKey
 	{
 		get
 		{
@@ -71,7 +70,7 @@ public class BaseCanvas : MonoBehaviour
 		}
 	}
 
-	public GameObject preView
+	public GameObject PreView
 	{
 		get
 		{
@@ -79,7 +78,7 @@ public class BaseCanvas : MonoBehaviour
 		}
 	}
 
-	public bool isBack
+	public bool IsBack
 	{
 		get
 		{
@@ -91,7 +90,7 @@ public class BaseCanvas : MonoBehaviour
 		}
 	}
 
-	public bool isShow
+	public bool IsShow
 	{
 		get
 		{
@@ -103,7 +102,7 @@ public class BaseCanvas : MonoBehaviour
 		}
 	}
 
-	public CanvasGroup canvasGroup
+	public CanvasGroup CanvasGroup
 	{
 		get
 		{
@@ -113,11 +112,11 @@ public class BaseCanvas : MonoBehaviour
 
 	protected virtual void Awake()
 	{
-		GameObject pGameObject = GameObject.FindGameObjectWithTag(@"KeyManager");
+		GameObject pGameObject = GameObject.FindGameObjectWithTag("KeyManager");
 
 		if (pGameObject == null)
 		{
-			Debug.LogWarning(@"Warning - You should add a KeyManager GameObject in the " + LevelNameEnum.ActiveSceneName);
+			Debug.LogWarning("Warning - You should add a KeyManager GameObject in the " + LevelNameEnum.ActiveSceneName);
 		}
 		else
 		{
@@ -143,7 +142,7 @@ public class BaseCanvas : MonoBehaviour
 
 		if (m_DelayShow)
 		{
-			// m_CanvasGroup.SetActive(false); // 快速连点,这里会导致重复打开UI的问题!故注释掉.
+			// m_CanvasGroup.SetActive(false); // Quickly connect the points, this will lead to the problem of repeatedly opening the UI! So comment it out.
 
 			if (BlockCanvas.HasInstance) BlockCanvas.GetInstance.Show(EFFECT_SHOW_TIME * 1.1f);
 		}
@@ -174,7 +173,7 @@ public class BaseCanvas : MonoBehaviour
 			}
 		}
 
-		if (m_PreView != null) Invoke(@"HidePreView", SHOW_VIEW_DELAY);
+		if (m_PreView != null) Invoke(nameof(HidePreView), SHOW_VIEW_DELAY);
 	}
 
 	protected virtual void OnDisable()
@@ -233,7 +232,7 @@ public class BaseCanvas : MonoBehaviour
 
 			if (BlockCanvas.HasInstance) BlockCanvas.GetInstance.Show(EFFECT_HIDE_TIME * 1.1f);
 
-			BroadcastMessage(@"OnHide", SendMessageOptions.DontRequireReceiver);
+			BroadcastMessage("OnHide", SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
@@ -251,7 +250,7 @@ public class BaseCanvas : MonoBehaviour
 			m_CanvasGroup.SetTweenActive(true);
 		}
 
-		BroadcastMessage(@"OnShow", SendMessageOptions.DontRequireReceiver);
+		BroadcastMessage("OnShow", SendMessageOptions.DontRequireReceiver);
 	}
 
 	protected virtual void HidePreView()
@@ -259,16 +258,9 @@ public class BaseCanvas : MonoBehaviour
 		Debug.Log("PreView===>" + m_PreView);
 		if (m_PreView != null)
 		{
-			m_PreView.BroadcastMessage(@"OnHidePreView", SendMessageOptions.DontRequireReceiver);
+			m_PreView.BroadcastMessage("OnHidePreView", SendMessageOptions.DontRequireReceiver);
 
-			CanvasGroup pCanvasGroup = m_PreView.GetComponent<CanvasGroup>();
-
-			if (m_PreView.name == "DrawCardView(Clone)" || m_PreView.name == "HeroDetailAlert(Clone)")
-			{
-				transform.GetComponent<Canvas>().sortingOrder = 20;
-			}
-
-			if (pCanvasGroup != null)
+			if (m_PreView.TryGetComponent<CanvasGroup>(out var pCanvasGroup))
 			{
 				pCanvasGroup.SetTweenActive(false, true, EFFECT_HIDE_TIME / 2f);
 			}
@@ -283,11 +275,9 @@ public class BaseCanvas : MonoBehaviour
 	{
 		if (m_IsBack)
 		{
-			m_PreView.BroadcastMessage(@"OnShowPreView", SendMessageOptions.DontRequireReceiver);
+			m_PreView.BroadcastMessage("OnShowPreView", SendMessageOptions.DontRequireReceiver);
 
-			CanvasGroup pCanvasGroup = m_PreView.GetComponent<CanvasGroup>();
-
-			if (pCanvasGroup != null)
+			if (m_PreView.TryGetComponent<CanvasGroup>(out var pCanvasGroup))
 			{
 				pCanvasGroup.SetActive(true);
 			}

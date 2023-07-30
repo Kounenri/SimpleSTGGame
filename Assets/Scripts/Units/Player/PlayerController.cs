@@ -115,6 +115,12 @@ public class PlayerController : MonoBehaviour
 		{
 			if (m_IsFireKeyPressed)
 			{
+				if (!LevelManager.GetInstance.IsRunning)
+				{
+					m_IsFireKeyPressed = false;
+					return;
+				}
+
 				(bool bResult, WeaponVO pWeaponVO) = m_PlayerUnits.FireWeapon();
 
 				if (bResult) { Fire(pWeaponVO); }
@@ -402,6 +408,8 @@ public class PlayerController : MonoBehaviour
 
 	public void OnMove(InputAction.CallbackContext context)
 	{
+		if (!LevelManager.GetInstance.IsRunning) return;
+
 		if (!m_PlayerUnits.IsDead())
 		{
 			// read the value for the "Move" action each event call
@@ -411,6 +419,8 @@ public class PlayerController : MonoBehaviour
 
 	public void OnJump(InputAction.CallbackContext context)
 	{
+		if (!LevelManager.GetInstance.IsRunning) return;
+
 		if (!context.started) return;
 
 		if (!m_PlayerUnits.IsDead())
@@ -421,6 +431,8 @@ public class PlayerController : MonoBehaviour
 
 	public void OnFire(InputAction.CallbackContext context)
 	{
+		if (!LevelManager.GetInstance.IsRunning) return;
+
 		if (context.started) m_IsFireKeyPressed = true;
 
 		if (context.canceled) m_IsFireKeyPressed = false;
@@ -428,6 +440,8 @@ public class PlayerController : MonoBehaviour
 
 	public void OnReload(InputAction.CallbackContext context)
 	{
+		if (!LevelManager.GetInstance.IsRunning) return;
+
 		if (!context.started) return;
 
 		if (!m_PlayerUnits.IsDead())
@@ -438,6 +452,8 @@ public class PlayerController : MonoBehaviour
 
 	public void OnPointerMove(InputAction.CallbackContext context)
 	{
+		if (!LevelManager.GetInstance.IsRunning) return;
+
 		if (!m_PlayerUnits.IsDead())
 		{
 			// read the value for the "Pointer Move" action each event call

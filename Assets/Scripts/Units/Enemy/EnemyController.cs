@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using UnityEngine;
 
@@ -72,6 +73,11 @@ public class EnemyController : MonoBehaviour
 		m_WaitForSetPosition = true;
 
 		m_Controller.enabled = true;
+		m_Controller.detectCollisions = true;
+
+		ParticleSystem pParticleSystem = GetComponentInChildren<ParticleSystem>();
+
+		if (pParticleSystem != null) pParticleSystem.Play(true);
 	}
 
 	private void AssignAnimationIDs()
@@ -209,27 +215,35 @@ public class EnemyController : MonoBehaviour
 
 	public void OnDead()
 	{
-		if (m_EnemyUnits.IsDead())
+		m_Controller.enabled = false;
+		m_Controller.detectCollisions = false;
+
+		ParticleSystem pParticleSystem = GetComponentInChildren<ParticleSystem>();
+
+		if (pParticleSystem != null) pParticleSystem.Stop(true);
+
+		// fade in to ground
+		transform.DOMoveY(-2f, 2f).SetDelay(5f).OnComplete(() =>
 		{
-			m_Controller.enabled = false;
+			ObjectPoolManager.GetInstance.Release(gameObject);
+		});
 
-			// update animator if using character
-			if (m_HasAnimator)
+		// update animator if using character
+		if (m_HasAnimator)
+		{
+			int nRandom = UnityEngine.Random.Range(0, 2);
+
+			if (nRandom == 0)
 			{
-				int nRandom = UnityEngine.Random.Range(0, 2);
-
-				if (nRandom == 0)
-				{
-					m_Animator.Play("Z_FallingForward");
-				}
-				else
-				{
-					m_Animator.Play("Z_FallingBack");
-				}
-
-				m_Animator.SetBool(m_AnimIDWalk, false);
-				m_Animator.SetBool(m_AnimIDRun, false);
+				m_Animator.Play("Z_FallingForward");
 			}
+			else
+			{
+				m_Animator.Play("Z_FallingBack");
+			}
+
+			m_Animator.SetBool(m_AnimIDWalk, false);
+			m_Animator.SetBool(m_AnimIDRun, false);
 		}
 	}
 }

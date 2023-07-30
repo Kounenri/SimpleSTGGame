@@ -92,11 +92,6 @@ public class PlayerController : MonoBehaviour
 
 	private void Start()
 	{
-		if (LevelController.HasInstance)
-		{
-			LevelController.GetInstance.AddEventListener(LevelController.ON_PLAYER_DEAD, OnPlayerDead);
-		}
-
 		m_HasAnimator = TryGetComponent(out m_Animator);
 
 		AssignAnimationIDs();
@@ -132,30 +127,6 @@ public class PlayerController : MonoBehaviour
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
-		}
-	}
-
-	private void OnDestroy()
-	{
-		if (LevelController.HasInstance)
-		{
-			LevelController.GetInstance.RemoveEventListener(LevelController.ON_PLAYER_DEAD, OnPlayerDead);
-		}
-	}
-
-	private void OnPlayerDead(TEvent pTEvent)
-	{
-		if (m_PlayerUnits.IsDead())
-		{
-			// update animator if using character
-			if (m_HasAnimator)
-			{
-				m_Animator.Play("Die");
-				m_Animator.SetBool(m_AnimIDFront, false);
-				m_Animator.SetBool(m_AnimIDBack, false);
-				m_Animator.SetBool(m_AnimIDLeft, false);
-				m_Animator.SetBool(m_AnimIDRight, false);
-			}
 		}
 	}
 
@@ -409,7 +380,7 @@ public class PlayerController : MonoBehaviour
 	{
 		if (animationEvent.animatorClipInfo.weight > 0.5f)
 		{
-			SoundManager.PlaySound(m_FireAudioClip[LevelController.GetInstance.CurrentWeapon.ID - 1], 0, m_FootstepAudioVolume);
+			SoundManager.PlaySound(m_FireAudioClip[LevelManager.GetInstance.CurrentWeaponVO.ID - 1], 0, m_FootstepAudioVolume);
 		}
 	}
 
@@ -417,7 +388,7 @@ public class PlayerController : MonoBehaviour
 	{
 		if (animationEvent.animatorClipInfo.weight > 0.5f)
 		{
-			SoundManager.PlaySound(m_ReloadAudioClip[LevelController.GetInstance.CurrentWeapon.ID - 1], 0, m_FootstepAudioVolume);
+			SoundManager.PlaySound(m_ReloadAudioClip[LevelManager.GetInstance.CurrentWeaponVO.ID - 1], 0, m_FootstepAudioVolume);
 		}
 	}
 
@@ -500,6 +471,22 @@ public class PlayerController : MonoBehaviour
 		{
 			// The Raycast did not hit anything.
 			return (false, Vector3.zero);
+		}
+	}
+
+	public void OnDead()
+	{
+		if (m_PlayerUnits.IsDead())
+		{
+			// update animator if using character
+			if (m_HasAnimator)
+			{
+				m_Animator.Play("Die");
+				m_Animator.SetBool(m_AnimIDFront, false);
+				m_Animator.SetBool(m_AnimIDBack, false);
+				m_Animator.SetBool(m_AnimIDLeft, false);
+				m_Animator.SetBool(m_AnimIDRight, false);
+			}
 		}
 	}
 }

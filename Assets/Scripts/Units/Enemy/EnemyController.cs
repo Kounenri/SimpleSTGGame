@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 [RequireComponent(typeof(EnemyUnits))]
 public class EnemyController : MonoBehaviour
@@ -10,6 +9,27 @@ public class EnemyController : MonoBehaviour
 	private float m_RotationSmoothTime = 0.12f;
 	[SerializeField]
 	private float m_SpeedChangeRate = 10.0f;
+	[SerializeField]
+	private bool m_Grounded = true;
+	[SerializeField]
+	private float m_GroundedOffset = -0.14f;
+	[SerializeField]
+	private float m_GroundedRadius = 0.28f;
+	[SerializeField]
+	private LayerMask m_GroundLayers;
+	[SerializeField]
+	private float m_Gravity = -15.0f;
+	[SerializeField]
+	private float m_FallTimeout = 0.15f;
+	[SerializeField]
+	private AudioClip[] m_FootstepAudioClips;
+	[Range(0, 1)]
+	[SerializeField]
+	private float m_FootstepAudioVolume = 0.5f;
+	[SerializeField]
+	private AudioClip m_AttackAudioClip;
+	[SerializeField]
+	private AudioClip m_DieAudioClip;
 
 	private EnemyUnits m_EnemyUnits;
 	private Animator m_Animator;
@@ -20,14 +40,19 @@ public class EnemyController : MonoBehaviour
 	private float m_AnimationBlend;
 	private float m_TargetRotation = 0.0f;
 	private float m_RotationVelocity;
+	private float m_VerticalVelocity;
+	private float m_TerminalVelocity = 53.0f;
 
 	// animation IDs
 	private int m_AnimIDSpeed;
 	private int m_AnimIDWalk;
 	private int m_AnimIDRun;
 
+	// timeout deltatime
+	private float m_FallTimeoutDelta;
+
 	private bool m_HasAnimator;
-	public bool m_WaitForSetPosition = true;
+	private bool m_WaitForSetPosition = true;
 
 	private void Awake()
 	{
@@ -44,9 +69,9 @@ public class EnemyController : MonoBehaviour
 
 	private void OnEnable()
 	{
-		m_Controller.enabled = true;
-
 		m_WaitForSetPosition = true;
+
+		m_Controller.enabled = true;
 	}
 
 	private void AssignAnimationIDs()
@@ -62,14 +87,18 @@ public class EnemyController : MonoBehaviour
 
 		if (!m_EnemyUnits.IsDead())
 		{
-			Vector3 pTargetDirection = m_EnemyUnits.GetPlayerPosition() - transform.position;
+			PlayerUnits pPlayerUnits = LevelController.GetInstance.CurrentPlayer;
 
-			if (pTargetDirection.magnitude < m_EnemyUnits.AttackRange && !m_EnemyUnits.PlayerUnits.IsDead())
+			Vector3 pTargetDirection = pPlayerUnits.transform.position - transform.position;
+
+			if (pTargetDirection.magnitude < m_EnemyUnits.AttackRange && !pPlayerUnits.IsDead())
 			{
 				Attack();
 			}
 			else if (!m_WaitForSetPosition)
 			{
+				Gravity();
+				GroundedCheck();
 				Move(pTargetDirection);
 			}
 
@@ -77,12 +106,48 @@ public class EnemyController : MonoBehaviour
 		}
 	}
 
+	private void Gravity()
+	{
+		if (m_Grounded)
+		{
+			// reset the fall timeout timer
+			m_FallTimeoutDelta = m_FallTimeout;
+
+			// stop our velocity dropping infinitely when grounded
+			if (m_VerticalVelocity < 0.0f)
+			{
+				m_VerticalVelocity = -2f;
+			}
+		}
+		else
+		{
+			// fall timeout
+			if (m_FallTimeoutDelta >= 0.0f)
+			{
+				m_FallTimeoutDelta -= Time.deltaTime;
+			}
+		}
+
+		// apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
+		if (m_VerticalVelocity < m_TerminalVelocity)
+		{
+			m_VerticalVelocity += m_Gravity * Time.deltaTime;
+		}
+	}
+
+	private void GroundedCheck()
+	{
+		// set sphere position, with offset
+		Vector3 pSpherePosition = new Vector3(transform.position.x, transform.position.y - m_GroundedOffset, transform.position.z);
+		m_Grounded = Physics.CheckSphere(pSpherePosition, m_GroundedRadius, m_GroundLayers, QueryTriggerInteraction.Ignore);
+	}
+
 	private void Move(Vector3 pTargetDirection)
 	{
 		// set target speed based on move speed
 		m_Speed = m_EnemyUnits.MoveSpeed;
 
-		if (m_EnemyUnits.PlayerUnits.IsDead()) m_Speed = 0.0f;
+		if (LevelController.GetInstance.CurrentPlayer.IsDead()) m_Speed = 0.0f;
 
 		m_AnimationBlend = Mathf.Lerp(m_AnimationBlend, m_Speed, Time.deltaTime * m_SpeedChangeRate);
 
@@ -101,7 +166,7 @@ public class EnemyController : MonoBehaviour
 
 		pTargetDirection = Quaternion.Euler(0.0f, m_TargetRotation, 0.0f) * Vector3.forward;
 
-		Vector3 pMotion = pTargetDirection.normalized * (m_Speed * Time.deltaTime);
+		Vector3 pMotion = pTargetDirection.normalized * (m_Speed * Time.deltaTime) + new Vector3(0.0f, m_VerticalVelocity, 0.0f) * Time.deltaTime; ;
 
 		// move the player
 		m_Controller.Move(pMotion);

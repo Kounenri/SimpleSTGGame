@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class ObjectPoolManager : TMonoInstanceLite<ObjectPoolManager>
 {
@@ -22,7 +21,7 @@ public class ObjectPoolManager : TMonoInstanceLite<ObjectPoolManager>
 
 	protected override void Awake()
 	{
-		base.Awake();
+		g_Instance = this;
 
 		for (int i = 0; i < m_ObjectPoolList.Count; i++)
 		{

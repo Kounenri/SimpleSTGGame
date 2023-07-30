@@ -1,30 +1,34 @@
 ﻿public static class PlayerPrefNames
 {
-	public const string APP_START_COUNT = @"APP_START_COUNT";
+	public const string APP_START_COUNT = "APP_START_COUNT";
 
 	/// <summary>
-	/// 语言设置 string
+	/// Launguage setting (string)
 	/// </summary>
-	public const string CURRENT_LANG = @"CURRENT_LANG";
+	public const string CURRENT_LANG = "CURRENT_LANG";
 
 	/// <summary>
-	/// 音效大小 float
+	/// Soune volume (float)
 	/// </summary>
-	public const string SOUND_VOL = @"SOUND_VOL";
-	/// <summary>
-	/// 音效大小 float
-	/// </summary>
-	public const string MUSIC_VOL = @"MUSIC_VOL";
-
-	public const string Disable_Log = @"Disable_Log";
+	public const string SOUND_VOL = "SOUND_VOL";
 
 	/// <summary>
-	/// 游戏帧率
+	/// Muxic volume (float)
 	/// </summary>
-	public const string GAME_FPS = @"GAME_FPS";
+	public const string MUSIC_VOL = "MUSIC_VOL";
 
 	/// <summary>
-	/// 显示品质
+	/// Disable game log (bool)
 	/// </summary>
-	public const string QUALITY_LEVEL = @"QUALITY_LEVEL";
+	public const string DISABLE_LOG = "DISABLE_LOG";
+
+	/// <summary>
+	/// Game FPS (float)
+	/// </summary>
+	public const string GAME_FPS = "GAME_FPS";
+
+	/// <summary>
+	/// Display Quality (int)
+	/// </summary>
+	public const string QUALITY_LEVEL = "QUALITY_LEVEL";
 }

@@ -124,7 +124,7 @@ public class SoundManager : TMonoInstanceLite<SoundManager>
 
 	protected void PlayTheMusic(string strClipName, float startTime = 0f)
 	{
-		if (GameConfig.enableMusic == false) return;
+		if (GameConfig.ENABLE_MUSIC == false) return;
 
 		if (strClipName == m_GameMusic)
 		{

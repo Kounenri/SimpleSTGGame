@@ -1,73 +1,57 @@
-using System.Collections;
-using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class EnemyUnits : BaseUnits
 {
-	[SerializeField]
-	private float m_Damage = 1f;
-	[SerializeField]
-	private float m_AttackRange = 1f;
-	[SerializeField]
-	private float m_AttackInterval = 1f;
+	private EnemyVO m_EnemyVO;
+	private EnemyController m_Controller;
 
 	private float m_LastAttackTime = 0f;
 
-	private EnemyController m_EnemyController;
-	private GameObject m_PlayerObject;
-	private PlayerUnits m_PlayerUnits;
+	public int MoveSpeed { get { return m_EnemyVO.MoveSpeed; } }
 
-	public float Damage
-	{
-		get { return m_Damage; }
-	}
+	public int Damage { get { return m_EnemyVO.Damage; } }
 
-	public float AttackRange
-	{
-		get { return m_AttackRange; }
-	}
+	public float AttackRange { get { return m_EnemyVO.AttackRange; } }
 
-	public float AttackInterval
-	{
-		get { return m_AttackInterval; }
-	}
-
-	public PlayerUnits PlayerUnits
-	{
-		get { return m_PlayerUnits; }
-	}
+	public float AttackInterval { get { return m_EnemyVO.AttackInterval; } }
 
 	private void Awake()
 	{
-		m_EnemyController = GetComponent<EnemyController>();
+		m_Controller = GetComponent<EnemyController>();
 	}
 
 	private void OnEnable()
 	{
-		m_PlayerObject = GameObject.FindGameObjectWithTag("Player");
+		LevelController.GetInstance.OnActiveEnemy();
 
-		if (m_PlayerObject != null)
-		{
-			m_PlayerUnits = m_PlayerObject.GetComponent<PlayerUnits>();
-		}
-		else
-		{
-			gameObject.SetActive(false);
+		ParticleSystem pParticleSystem = GetComponentInChildren<ParticleSystem>();
 
-			Debug.Log("Can't find player object!");
-		}
+		if (pParticleSystem != null) pParticleSystem.Play(true);
 	}
 
 	protected override void OnDead()
 	{
-		m_EnemyController.OnDead();
+		LevelController.GetInstance.OnDeactiveEnemy();
 
-		base.OnDead();
+		m_Controller.OnDead();
+
+		ParticleSystem pParticleSystem = GetComponentInChildren<ParticleSystem>();
+
+		if (pParticleSystem != null) pParticleSystem.Stop(true);
+
+		// fade in to ground
+		transform.DOMoveY(-2f, 2f).SetDelay(5f).OnComplete(() =>
+		{
+			ObjectPoolManager.GetInstance.Release(gameObject);
+		});
 	}
 
-	public Vector3 GetPlayerPosition()
+	public void ResetUnit(EnemyVO pEnemyVO)
 	{
-		return m_PlayerObject.transform.position;
+		m_EnemyVO = pEnemyVO;
+
+		m_CurrentHP = m_EnemyVO.TotalHP;
 	}
 
 	public void DoAttack()
@@ -76,7 +60,7 @@ public class EnemyUnits : BaseUnits
 		{
 			if (m_LastAttackTime == 0f || Time.time - m_LastAttackTime > AttackInterval)
 			{
-				m_PlayerUnits.BeAttack(Damage);
+				LevelController.GetInstance.CurrentPlayer.BeAttack(Damage);
 
 				m_LastAttackTime = Time.time;
 			}

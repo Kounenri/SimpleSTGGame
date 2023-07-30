@@ -23,7 +23,7 @@ public class TMonoInstanceLite<T> : MonoBehaviour where T : MonoBehaviour
 		{
 			if (g_ApplicationIsQuitting)
 			{
-				Debug.LogWarning(typeof(T) + @" is already destroyed. Returning null. Please check HasInstance first before accessing instance in destructor.");
+				Debug.LogWarning(typeof(T) + " is already destroyed. Returning null. Please check HasInstance first before accessing instance in destructor.");
 
 				return null;
 			}

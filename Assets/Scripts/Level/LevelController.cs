@@ -1,90 +1,121 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public class LevelController : TMonoEventDispatcher<LevelController>, IDispatcher
+public class LevelController : TMonoInstanceLite<LevelController>
 {
-	public const string ON_BULLET_COUNT_CHANGE = "ON_BULLET_COUNT_CHANGE";
+	private PlayerUnits m_CurrentPlayer;
+	private int m_CurrenyEnemyCount;
+	private Dictionary<int, int> m_EnemyDictionary;
+	private Coroutine m_PlayerCoroutine;
+	private Coroutine m_EnemyCoroutine;
+	private bool m_StartCountDown;
+	private float m_LeftTime;
 
-	public const string ON_WEAPON_CHANGE = "ON_WEAPON_CHANGE";
-	public const string ON_WEAPON_RELOAD = "ON_WEAPON_RELOAD";
+	public PlayerUnits CurrentPlayer { get { return m_CurrentPlayer; } }
 
-	public const string ON_PLAYER_HP_CHANG = "ON_PLAYER_HP_CHANG";
-	public const string ON_PLAYER_DEAD = "ON_PLAYER_DEAD";
+	public int CurrentEnemyCount { get { return m_CurrenyEnemyCount; } }
 
-	private bool m_NeedResetGame = false;
-	private WeaponVO m_CurrentWeapon;
-
-	public WeaponVO CurrentWeapon
-	{
-		get { return m_CurrentWeapon; }
-		set { m_CurrentWeapon = value; }
-	}
+	public float LeftTime { get { return m_LeftTime; } }
 
 	protected override void Awake()
 	{
-		base.Awake();
-
-		SceneManager.sceneLoaded += OnLoadCallback;
+		g_Instance = this;
 	}
 
-	private void OnLoadCallback(Scene pScene, LoadSceneMode pLoadSceneMode)
+	protected override void Start()
 	{
-		if (pScene.name == LevelNameEnum.GameScene)
+		base.Start();
+
+		ObjectPoolManager.Create();
+
+		LevelManager.GetInstance.OnLevelLoaded();
+	}
+
+	private void Update()
+	{
+		if (m_StartCountDown)
 		{
-			StartCoroutine(InitializeLevel());
+			m_LeftTime -= Time.deltaTime;
+
+			if (m_LeftTime <= 0f)
+			{
+				m_StartCountDown = false;
+
+				LevelManager.GetInstance.LevelFail(LevelFailEnum.TimeOut);
+			}
 		}
 	}
 
-	private IEnumerator InitializeLevel()
+	private IEnumerator OnInitializePlayer()
 	{
 		yield return new WaitForEndOfFrame();
 
-		Debug.Log("Begin Initialize Level.");
-
-		if (m_CurrentWeapon == null)
-		{
-			LoadDefaultWeapon();
-		}
-
-		if (m_NeedResetGame)
-		{
-			RecycleAllObjects();
-
-			LoadDefaultWeapon();
-
-			m_NeedResetGame = false;
-		}
+		Debug.Log("Begin Initialize Player.");
 
 		GameObject pPlayerObject = ObjectPoolManager.GetInstance.Get("Player");
 
 		pPlayerObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
 
-		PlayerUnits pPlayerUnits = pPlayerObject.GetComponent<PlayerUnits>();
+		m_CurrentPlayer = pPlayerObject.GetComponent<PlayerUnits>();
 
-		pPlayerUnits.ResetUnit();
-
-		for (int i = 0; i < 50; i++)
-		{
-			GameObject pEnemyObject = ObjectPoolManager.GetInstance.Get("Zombie1");
-
-			Vector3 pCircle = Random.insideUnitCircle * 10;
-			Vector3 pPosition = pCircle.normalized * (10 + pCircle.magnitude);
-
-			pEnemyObject.transform.position = new Vector3(pPosition.x, 0, pPosition.y);
-
-			EnemyUnits pEnemyUnits = pEnemyObject.GetComponent<EnemyUnits>();
-
-			pEnemyUnits.ResetUnit();
-		}
+		m_CurrentPlayer.ResetUnit();
 
 		yield return null;
 	}
 
-	private void LoadDefaultWeapon()
+	private IEnumerator OnInitializeEnemy()
 	{
-		ChangeWeapon(WeaponConfProxy.GetInstance.GetDataVO(1));
+		yield return new WaitForEndOfFrame();
+
+		Debug.Log("Begin OnInitialize Enemy.");
+
+		LevelVO pLevelVO = LevelManager.GetInstance.CurrentLevelVO;
+
+		for (int i = 0; i < pLevelVO.EnemyIDList.Count; i++)
+		{
+			m_EnemyDictionary.Add(pLevelVO.EnemyIDList[i], pLevelVO.EnemyCountList[i]);
+		}
+
+		while (true)
+		{
+			if (m_CurrenyEnemyCount < pLevelVO.EnemyOnScreen)
+			{
+				List<int> pIDList = new();
+
+				foreach (int nKey in m_EnemyDictionary.Keys)
+				{
+					if (m_EnemyDictionary[nKey] > 0)
+					{
+						pIDList.Add(nKey);
+					}
+				}
+
+				if (pIDList.Count <= 0) break;
+
+				int nEnemyID = pIDList[Random.Range(0, pIDList.Count)];
+
+				OnCreateEnemy(EnemyConfProxy.GetInstance.GetDataVO(nEnemyID));
+
+				m_EnemyDictionary[nEnemyID] = m_EnemyDictionary[nEnemyID] - 1;
+			}
+
+			yield return new WaitForEndOfFrame();
+		}
+	}
+
+	private void OnCreateEnemy(EnemyVO pEnemyVO)
+	{
+		GameObject pEnemyObject = ObjectPoolManager.GetInstance.Get(pEnemyVO.PrefabName);
+
+		Vector3 pCircle = Random.insideUnitCircle * 10;
+		Vector3 pPosition = pCircle.normalized * (10 + pCircle.magnitude);
+
+		pEnemyObject.transform.position = new Vector3(pPosition.x, 0, pPosition.y);
+
+		EnemyUnits pEnemyUnits = pEnemyObject.GetComponent<EnemyUnits>();
+
+		pEnemyUnits.ResetUnit(pEnemyVO);
 	}
 
 	private void RecycleAllObjects()
@@ -111,33 +142,58 @@ public class LevelController : TMonoEventDispatcher<LevelController>, IDispatche
 		}
 	}
 
-	public void ChangeWeapon(WeaponVO pWeapon)
+	public void InitializeLevel()
 	{
-		m_CurrentWeapon = pWeapon;
+		m_EnemyDictionary = new Dictionary<int, int>();
 
-		DispatchEvent(ON_WEAPON_CHANGE, m_CurrentWeapon);
-		DispatchEvent(ON_BULLET_COUNT_CHANGE, m_CurrentWeapon.Capacity);
+		m_PlayerCoroutine = StartCoroutine(OnInitializePlayer());
+
+		m_EnemyCoroutine = StartCoroutine(OnInitializeEnemy());
+
+		m_LeftTime = LevelManager.GetInstance.CurrentLevelVO.CountDownTime;
+
+		m_StartCountDown = true;
 	}
 
-	public void BulletCountChange(int nCount)
+	public void ResetLevel()
 	{
-		DispatchEvent(ON_BULLET_COUNT_CHANGE, nCount);
+		m_EnemyDictionary.Clear();
+
+		if (m_PlayerCoroutine != null)
+		{
+			StopCoroutine(m_PlayerCoroutine);
+			m_PlayerCoroutine = null;
+		}
+
+		if (m_EnemyCoroutine != null)
+		{
+			StopCoroutine(m_EnemyCoroutine);
+			m_EnemyCoroutine = null;
+		}
+
+		RecycleAllObjects();
+
+		m_PlayerCoroutine = StartCoroutine(OnInitializePlayer());
+
+		m_EnemyCoroutine = StartCoroutine(OnInitializeEnemy());
+
+		m_LeftTime = LevelManager.GetInstance.CurrentLevelVO.CountDownTime;
+
+		m_StartCountDown = true;
 	}
 
-	public void PlayerHPChanged(float fPlayerHP)
+	public void OnActiveEnemy()
 	{
-		if (fPlayerHP < 0f) fPlayerHP = 0f;
-
-		DispatchEvent(ON_PLAYER_HP_CHANG, fPlayerHP);
+		m_CurrenyEnemyCount++;
 	}
 
-	public void PlayerDead()
+	public void OnDeactiveEnemy()
 	{
-		DispatchEvent(ON_PLAYER_DEAD);
-	}
+		m_CurrenyEnemyCount--;
 
-	public void DoneReloadWeapon()
-	{
-		DispatchEvent(ON_WEAPON_RELOAD, m_CurrentWeapon);
+		if (m_CurrenyEnemyCount == 0)
+		{
+			LevelManager.GetInstance.LevelClear();
+		}
 	}
 }

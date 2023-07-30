@@ -1,13 +1,19 @@
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 
 public class PlayerUnits : BaseUnits
 {
 	private WeaponVO m_CurrentWeapon;
+	private PlayerController m_Controller;
 
+	private int m_TotalHP = 100;
+	private int m_MoveSpeed = 4;
 	private int m_LeftBulletCount = 0;
 	private bool m_IsReloadingWeapon = false;
 	private float m_LastFireTime = 0f;
 	private float m_LastReloadTime = 0f;
+
+	public int MoveSpeed { get { return m_MoveSpeed; } }
 
 	public bool IsReloadingWeapon { get { return m_IsReloadingWeapon; } }
 
@@ -15,17 +21,19 @@ public class PlayerUnits : BaseUnits
 
 	private void Awake()
 	{
-		if (LevelController.HasInstance)
+		m_Controller = GetComponent<PlayerController>();
+
+		if (LevelManager.HasInstance)
 		{
-			LevelController.GetInstance.AddEventListener(LevelController.ON_WEAPON_CHANGE, OnWeaponChange);
+			LevelManager.GetInstance.AddEventListener(LevelManager.ON_WEAPON_CHANGE, OnWeaponChange);
 		}
 	}
 
 	private void OnDestroy()
 	{
-		if (LevelController.HasInstance)
+		if (LevelManager.HasInstance)
 		{
-			LevelController.GetInstance.RemoveEventListener(LevelController.ON_WEAPON_CHANGE, OnWeaponChange);
+			LevelManager.GetInstance.RemoveEventListener(LevelManager.ON_WEAPON_CHANGE, OnWeaponChange);
 		}
 	}
 
@@ -37,7 +45,7 @@ public class PlayerUnits : BaseUnits
 		}
 		else
 		{
-			m_CurrentWeapon = LevelController.GetInstance.CurrentWeapon;
+			m_CurrentWeapon = LevelManager.GetInstance.CurrentWeaponVO;
 
 			m_LeftBulletCount = m_CurrentWeapon.Capacity;
 		}
@@ -47,21 +55,22 @@ public class PlayerUnits : BaseUnits
 	{
 		base.OnHPChange();
 
-		LevelController.GetInstance.PlayerHPChanged(m_CurrentHP);
+		LevelManager.GetInstance.PlayerHPChanged(m_CurrentHP);
 	}
 
 	protected override void OnDead()
 	{
-		LevelController.GetInstance.PlayerDead();
+		m_Controller.OnDead();
 
-		base.OnDead();
+		LevelManager.GetInstance.LevelFail(LevelFailEnum.PlayerDead);
 	}
 
-	public override void ResetUnit()
+	public void ResetUnit()
 	{
-		base.ResetUnit();
-
 		OnWeaponChange(null);
+
+		m_CurrentHP = m_TotalHP;
+		OnHPChange();
 
 		m_LeftBulletCount = m_CurrentWeapon.Capacity;
 
@@ -69,7 +78,7 @@ public class PlayerUnits : BaseUnits
 		m_LastFireTime = 0f;
 		m_LastReloadTime = 0f;
 
-		LevelController.GetInstance.BulletCountChange(m_LeftBulletCount);
+		LevelManager.GetInstance.BulletCountChange(m_LeftBulletCount);
 	}
 
 	public bool FireReady()
@@ -87,7 +96,7 @@ public class PlayerUnits : BaseUnits
 
 				m_LeftBulletCount--;
 
-				LevelController.GetInstance.BulletCountChange(m_LeftBulletCount);
+				LevelManager.GetInstance.BulletCountChange(m_LeftBulletCount);
 
 				return (true, m_CurrentWeapon);
 			}
@@ -129,7 +138,6 @@ public class PlayerUnits : BaseUnits
 
 		m_LeftBulletCount = m_CurrentWeapon.Capacity;
 
-		LevelController.GetInstance.DoneReloadWeapon();
-		LevelController.GetInstance.BulletCountChange(m_LeftBulletCount);
+		LevelManager.GetInstance.BulletCountChange(m_LeftBulletCount);
 	}
 }

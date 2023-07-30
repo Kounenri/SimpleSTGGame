@@ -23,7 +23,7 @@ public class GoInit : MonoBehaviour
 
 	private void Go()
 	{
-		if (!LevelController.HasInstance)
+		if (!ViewManager.HasInstance)
 		{
 			SceneManager.LoadScene(LevelNameEnum.InitScene);
 		}

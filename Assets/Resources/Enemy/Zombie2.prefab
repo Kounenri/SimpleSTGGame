@@ -267,13 +267,13 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1051978578024033107}
   serializedVersion: 8
-  lengthInSec: 100
+  lengthInSec: 1
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 0
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
-  emitterVelocityMode: 1
+  emitterVelocityMode: 0
   looping: 1
   prewarm: 1
   playOnAwake: 1
@@ -342,7 +342,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 100
+      scalar: 1
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -5351,11 +5351,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 170bbdf4b24d6c14f8cb67da245f0fb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TotalHP: 50
-  m_MoveSpeed: 3
-  m_Damage: 5
-  m_AttackRange: 2.5
-  m_AttackInterval: 1
 --- !u!114 &4832365515674423079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5370,7 +5365,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_RotationSmoothTime: 0.12
   m_SpeedChangeRate: 10
-  m_WaitForSetPosition: 1
+  m_Grounded: 1
+  m_GroundedOffset: -0.14
+  m_GroundedRadius: 0.28
+  m_GroundLayers:
+    serializedVersion: 2
+    m_Bits: 8
+  m_Gravity: -15
+  m_FallTimeout: 0.15
+  m_FootstepAudioClips: []
+  m_FootstepAudioVolume: 0.5
+  m_AttackAudioClip: {fileID: 0}
+  m_DieAudioClip: {fileID: 0}
 --- !u!1 &2057808353243881084
 GameObject:
   m_ObjectHideFlags: 0

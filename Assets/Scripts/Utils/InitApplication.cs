@@ -34,13 +34,13 @@ public class InitApplication : MonoBehaviour
 		Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
 #if !UNITY_EDITOR
-		if(PlayerPrefs.GetInt(PlayerPrefNames.Disable_Log,1) == 1)
+		if(PlayerPrefs.GetInt(PlayerPrefNames.DISABLE_LOG,1) == 1)
 		{
 			Debug.unityLogger.filterLogType = LogType.Error;
 		}
 		else
 		{
-			Instantiate(Resources.Load<GameObject>("Reporter"));
+			//Instantiate(Resources.Load<GameObject>("Reporter"));
 
 			Debug.unityLogger.filterLogType = LogType.Log;
 		}
@@ -73,11 +73,13 @@ public class InitApplication : MonoBehaviour
 	{
 		ViewManager.GetInstance.Initialize();
 
-		LevelController.GetInstance.Initialize();
+		LevelConfProxy.GetInstance.ParseConfig();
+
+		EnemyConfProxy.GetInstance.ParseConfig();
 
 		WeaponConfProxy.GetInstance.ParseConfig();
 
-		ObjectPoolManager.Create();
+		LevelManager.GetInstance.Initialize();
 
 		// For iPhone notch
 		//ScreenEdges.Create();

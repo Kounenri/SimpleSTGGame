@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine.XR;
 
 /// <summary>
 /// Load config from xml or json
@@ -98,6 +97,9 @@ public class WeaponVO : TDataVO
 	/// </summary>
 	public bool IsPenetrable { get; set; }
 
+	/// <summary>
+	/// Resources path for loading image
+	/// </summary>
 	public string Icon
 	{
 		get

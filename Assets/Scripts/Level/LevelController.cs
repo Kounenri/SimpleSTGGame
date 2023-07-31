@@ -39,8 +39,10 @@ public class LevelController : TMonoInstanceLite<LevelController>
 	{
 		if (m_StartCountDown)
 		{
+			// Do countdown here
 			m_LeftTime -= Time.deltaTime;
 
+			// When time gose to 0 then fail
 			if (m_LeftTime <= 0f)
 			{
 				m_StartCountDown = false;
@@ -58,6 +60,7 @@ public class LevelController : TMonoInstanceLite<LevelController>
 
 		GameObject pPlayerObject = ObjectPoolManager.GetInstance.Get("Player");
 
+		// Reset play position and rotation
 		pPlayerObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 0, 0));
 
 		m_CurrentPlayer = pPlayerObject.GetComponent<PlayerUnits>();
@@ -77,8 +80,10 @@ public class LevelController : TMonoInstanceLite<LevelController>
 
 		for (int i = 0; i < pLevelVO.EnemyIDList.Count; i++)
 		{
+			// Calculation total enemies number
 			m_CurrenyEnemyCount += pLevelVO.EnemyCountList[i];
 
+			// Save enemies id and count for later use
 			m_EnemyDictionary.Add(pLevelVO.EnemyIDList[i], pLevelVO.EnemyCountList[i]);
 		}
 
@@ -92,18 +97,22 @@ public class LevelController : TMonoInstanceLite<LevelController>
 
 				foreach (int nKey in m_EnemyDictionary.Keys)
 				{
+					// Add enemies id which still remain
 					if (m_EnemyDictionary[nKey] > 0)
 					{
 						pIDList.Add(nKey);
 					}
 				}
 
+				// If no remain enemies then break
 				if (pIDList.Count <= 0) break;
 
+				// Random select a type of enemies
 				int nEnemyID = pIDList[Random.Range(0, pIDList.Count)];
 
 				OnCreateEnemy(EnemyConfProxy.GetInstance.GetDataVO(nEnemyID));
 
+				// Calculat enemies remain count
 				m_EnemyDictionary[nEnemyID] = m_EnemyDictionary[nEnemyID] - 1;
 			}
 
@@ -115,8 +124,10 @@ public class LevelController : TMonoInstanceLite<LevelController>
 	{
 		GameObject pEnemyObject = ObjectPoolManager.GetInstance.Get(pEnemyVO.PrefabName);
 
+		// Refresh enemies near the player
 		Vector3 pPosition = GetRandomPosition();
 
+		// If the coordinates are out of the map, re-randomize
 		while (Mathf.Abs(pPosition.x) > 100 || Mathf.Abs(pPosition.z) > 100)
 		{
 			pPosition = GetRandomPosition();
@@ -133,7 +144,9 @@ public class LevelController : TMonoInstanceLite<LevelController>
 
 	private Vector3 GetRandomPosition()
 	{
+		// Create an immediate coordinate inside the circle
 		Vector2 pCircle = Random.insideUnitCircle * 20;
+		// Into a hollow circle
 		Vector2 pPosition = pCircle.normalized * (10 + pCircle.magnitude);
 
 		return new Vector3(pPosition.x, 0, pPosition.y) + m_CurrentPlayer.transform.position;
@@ -221,6 +234,7 @@ public class LevelController : TMonoInstanceLite<LevelController>
 
 	public void OnDeactiveEnemy()
 	{
+		// Calculate the number of remain enemies
 		m_OnScreenEnemyCount--;
 		m_CurrenyEnemyCount--;
 

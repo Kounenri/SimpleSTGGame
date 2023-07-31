@@ -4,13 +4,13 @@ public class ShakeCamera : MonoBehaviour
 {
 	// 震动幅度
 	[SerializeField]
-	public float m_ShakeLevel = 30f;
+	private float m_ShakeLevel = 30f;
 	// 震动时间
 	[SerializeField]
-	public float m_SetShakeTime = 1f;
+	private float m_SetShakeTime = 1f;
 	// 震动的FPS
 	[SerializeField]
-	public float m_ShakeFps = 45f;
+	private float m_ShakeFps = 45f;
 
 	// 震动标志位
 	private bool m_IsShakeCamera = false;
@@ -20,16 +20,16 @@ public class ShakeCamera : MonoBehaviour
 	private float m_ShakeDelta = 0.005f;
 	private Camera m_SelfCamera;
 
-	private Rect changeRect;
+	private Rect m_ChangeRect;
 
-	void Awake()
+	private void Awake()
 	{
 		m_SelfCamera = GetComponent<Camera>();
-		changeRect = new Rect(0.0f, 0.0f, 1.0f, 1.0f);
+		m_ChangeRect = new Rect(0.0f, 0.0f, 1.0f, 1.0f);
 	}
 
 	// Use this for initialization
-	void Start()
+	private void Start()
 	{
 		m_ShakeTime = m_SetShakeTime;
 		m_Fps = m_ShakeFps;
@@ -38,7 +38,7 @@ public class ShakeCamera : MonoBehaviour
 	}
 
 	// Update is called once per frame
-	void Update()
+	private void Update()
 	{
 		if (m_IsShakeCamera && Screen.safeArea.size == new Vector2(Screen.width, Screen.height))
 		{
@@ -47,9 +47,9 @@ public class ShakeCamera : MonoBehaviour
 				m_ShakeTime -= Time.deltaTime;
 				if (m_ShakeTime <= 0)
 				{
-					changeRect.xMin = 0.0f;
-					changeRect.yMin = 0.0f;
-					m_SelfCamera.rect = changeRect;
+					m_ChangeRect.xMin = 0.0f;
+					m_ChangeRect.yMin = 0.0f;
+					m_SelfCamera.rect = m_ChangeRect;
 					m_IsShakeCamera = false;
 					m_ShakeTime = m_SetShakeTime;
 					m_Fps = m_ShakeFps;
@@ -63,16 +63,16 @@ public class ShakeCamera : MonoBehaviour
 					if (m_FrameTime > 1.0 / m_Fps)
 					{
 						m_FrameTime = 0;
-						changeRect.xMin = m_ShakeDelta * (-1.0f + m_ShakeLevel * Random.value);
-						changeRect.yMin = m_ShakeDelta * (-1.0f + m_ShakeLevel * Random.value);
-						m_SelfCamera.rect = changeRect;
+						m_ChangeRect.xMin = m_ShakeDelta * (-1.0f + m_ShakeLevel * Random.value);
+						m_ChangeRect.yMin = m_ShakeDelta * (-1.0f + m_ShakeLevel * Random.value);
+						m_SelfCamera.rect = m_ChangeRect;
 					}
 				}
 			}
 		}
 	}
 
-	public void shake()
+	public void Shake()
 	{
 		m_IsShakeCamera = true;
 	}

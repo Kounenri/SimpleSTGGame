@@ -111,6 +111,7 @@ public class MainViewUI : BaseCanvas
 	{
 		LevelVO pLevelVO = pTEvent.Data as LevelVO;
 
+		LevelChangeHint.Create(pLevelVO);
 	}
 
 	private void OnPlayerHPChanged(TEvent pTEvent)
@@ -130,6 +131,7 @@ public class MainViewUI : BaseCanvas
 		}
 
 		m_WeaponNameText.text = m_WeaponVO.Name;
+		m_WeaponStatusText.text = LevelController.GetInstance.CurrentPlayer.LeftBulletCount + "/" + m_WeaponVO.Capacity;
 	}
 
 	private void OnBulletCountChanged(TEvent pTEvent)
@@ -139,6 +141,6 @@ public class MainViewUI : BaseCanvas
 
 	private void OnLeftEnemyCountChange(TEvent pTEvent)
 	{
-		m_EnemyCountText.text = "Enemy " + pTEvent.Data.ToString() + " " + GameObject.FindGameObjectsWithTag("Enemy").Length;
+		m_EnemyCountText.text = "Enemy " + pTEvent.Data.ToString();
 	}
 }

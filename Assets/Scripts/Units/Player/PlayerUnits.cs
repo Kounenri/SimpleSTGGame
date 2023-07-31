@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 
@@ -8,7 +9,7 @@ public class PlayerUnits : BaseUnits
 
 	private int m_TotalHP = 100;
 	private int m_MoveSpeed = 4;
-	private int m_LeftBulletCount = 0;
+	private Dictionary<int, int> m_LeftBulletCount = new Dictionary<int, int>();
 	private bool m_IsReloadingWeapon = false;
 	private float m_LastFireTime = 0f;
 	private float m_LastReloadTime = 0f;
@@ -17,7 +18,7 @@ public class PlayerUnits : BaseUnits
 
 	public bool IsReloadingWeapon { get { return m_IsReloadingWeapon; } }
 
-	public int LeftBulletCount { get { return m_LeftBulletCount; } }
+	public int LeftBulletCount { get { return m_LeftBulletCount[m_CurrentWeapon.ID]; } }
 
 	private void Awake()
 	{
@@ -47,7 +48,17 @@ public class PlayerUnits : BaseUnits
 		{
 			m_CurrentWeapon = LevelManager.GetInstance.CurrentWeaponVO;
 
-			m_LeftBulletCount = m_CurrentWeapon.Capacity;
+			m_LeftBulletCount[m_CurrentWeapon.ID] = m_CurrentWeapon.Capacity;
+		}
+	}
+
+	protected override void OnGetHit()
+	{
+		base.OnGetHit();
+
+		if (Camera.main.TryGetComponent<ShakeCamera>(out var pShakeCamera))
+		{
+			pShakeCamera.Shake();
 		}
 	}
 
@@ -72,18 +83,21 @@ public class PlayerUnits : BaseUnits
 		m_CurrentHP = m_TotalHP;
 		OnHPChange();
 
-		m_LeftBulletCount = m_CurrentWeapon.Capacity;
+		foreach (var nID in LevelManager.GetInstance.CurrentLevelVO.UnlockedWeapon)
+		{
+			m_LeftBulletCount[nID] = WeaponConfProxy.GetInstance.GetDataVO(nID).Capacity;
+		}
 
 		m_IsReloadingWeapon = false;
 		m_LastFireTime = 0f;
 		m_LastReloadTime = 0f;
 
-		LevelManager.GetInstance.BulletCountChange(m_LeftBulletCount);
+		LevelManager.GetInstance.BulletCountChange(m_LeftBulletCount[m_CurrentWeapon.ID]);
 	}
 
 	public bool FireReady()
 	{
-		return !m_IsReloadingWeapon && m_LeftBulletCount > 0;
+		return !m_IsReloadingWeapon && m_LeftBulletCount[m_CurrentWeapon.ID] > 0;
 	}
 
 	public (bool, WeaponVO) FireWeapon()
@@ -94,9 +108,9 @@ public class PlayerUnits : BaseUnits
 			{
 				m_LastFireTime = Time.time;
 
-				m_LeftBulletCount--;
+				m_LeftBulletCount[m_CurrentWeapon.ID]--;
 
-				LevelManager.GetInstance.BulletCountChange(m_LeftBulletCount);
+				LevelManager.GetInstance.BulletCountChange(m_LeftBulletCount[m_CurrentWeapon.ID]);
 
 				return (true, m_CurrentWeapon);
 			}
@@ -107,7 +121,7 @@ public class PlayerUnits : BaseUnits
 
 	public bool CanReloadWeapon()
 	{
-		return !m_IsReloadingWeapon && m_LeftBulletCount < m_CurrentWeapon.Capacity;
+		return !m_IsReloadingWeapon && m_LeftBulletCount[m_CurrentWeapon.ID] < m_CurrentWeapon.Capacity;
 	}
 
 	public bool ReloadWeapon()
@@ -136,8 +150,8 @@ public class PlayerUnits : BaseUnits
 	{
 		m_IsReloadingWeapon = false;
 
-		m_LeftBulletCount = m_CurrentWeapon.Capacity;
+		m_LeftBulletCount[m_CurrentWeapon.ID] = m_CurrentWeapon.Capacity;
 
-		LevelManager.GetInstance.BulletCountChange(m_LeftBulletCount);
+		LevelManager.GetInstance.BulletCountChange(m_LeftBulletCount[m_CurrentWeapon.ID]);
 	}
 }

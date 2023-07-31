@@ -10,11 +10,15 @@ public class BaseUnits : MonoBehaviour
 
 	protected virtual void OnHPChange() { }
 
+	protected virtual void OnGetHit() { }
+
 	protected virtual void OnDead() { }
 
 	public void BeAttack(int nDamage)
 	{
 		m_CurrentHP -= nDamage;
+
+		OnGetHit();
 
 		if (m_CurrentHP <= 0f)
 		{

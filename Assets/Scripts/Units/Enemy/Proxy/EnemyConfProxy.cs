@@ -37,7 +37,7 @@ public class EnemyConfProxy : TConfProxy<EnemyConfProxy, EnemyVO>
 			MoveSpeed = 3,
 			Damage = 5,
 			AttackRange = 2.5f,
-			AttackInterval = 0.8f,
+			AttackInterval = 1.5f,
 			ExperiencePoints = 2
 		});
 
@@ -49,10 +49,10 @@ public class EnemyConfProxy : TConfProxy<EnemyConfProxy, EnemyVO>
 			ResourceID = 3,
 			PrefabName = "Zombie3",
 			TotalHP = 100,
-			MoveSpeed = 4,
-			Damage = 10,
-			AttackRange = 3f,
-			AttackInterval = 0.5f,
+			MoveSpeed = 3,
+			Damage = 8,
+			AttackRange = 2.5f,
+			AttackInterval = 2f,
 			ExperiencePoints = 5
 		});
 	}

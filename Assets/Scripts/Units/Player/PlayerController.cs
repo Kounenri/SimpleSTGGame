@@ -111,16 +111,16 @@ public class PlayerController : MonoBehaviour
 	{
 		m_HasAnimator = TryGetComponent(out m_Animator);
 
+		if (!LevelManager.GetInstance.IsRunning)
+		{
+			m_IsFireKeyPressed = false;
+			m_MoveAmount = Vector2.zero;
+		}
+
 		if (!m_PlayerUnits.IsDead())
 		{
 			if (m_IsFireKeyPressed)
 			{
-				if (!LevelManager.GetInstance.IsRunning)
-				{
-					m_IsFireKeyPressed = false;
-					return;
-				}
-
 				(bool bResult, WeaponVO pWeaponVO) = m_PlayerUnits.FireWeapon();
 
 				if (bResult) { Fire(pWeaponVO); }

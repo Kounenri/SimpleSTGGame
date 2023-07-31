@@ -58,9 +58,12 @@ public class BulletUnits : BaseUnits
 		{
 			if (pCollider.TryGetComponent<EnemyUnits>(out var pEnemyUnits))
 			{
-				pEnemyUnits.BeAttack(m_Damage);
+				if (!pEnemyUnits.IsDead())
+				{
+					pEnemyUnits.BeAttack(m_Damage);
 
-				if (!m_IsPenetrable) OnDead();
+					if (!m_IsPenetrable) OnDead();
+				}
 			}
 		}
 	}

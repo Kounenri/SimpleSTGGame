@@ -23,7 +23,8 @@ public class MainViewWeaponRender : ARender
 	{
 		if (LevelManager.HasInstance)
 		{
-			LevelManager.GetInstance.AddEventListener(LevelManager.ON_WEAPON_CHANGE, OnWeaponChange);
+			LevelManager.GetInstance.AddEventListener(LevelManager.ON_LEVEL_CHANGE, OnChange);
+			LevelManager.GetInstance.AddEventListener(LevelManager.ON_WEAPON_CHANGE, OnChange);
 		}
 	}
 
@@ -31,7 +32,8 @@ public class MainViewWeaponRender : ARender
 	{
 		if (LevelManager.HasInstance)
 		{
-			LevelManager.GetInstance.RemoveEventListener(LevelManager.ON_WEAPON_CHANGE, OnWeaponChange);
+			LevelManager.GetInstance.RemoveEventListener(LevelManager.ON_WEAPON_CHANGE, OnChange);
+			LevelManager.GetInstance.RemoveEventListener(LevelManager.ON_LEVEL_CHANGE, OnChange);
 		}
 	}
 
@@ -71,8 +73,8 @@ public class MainViewWeaponRender : ARender
 		}
 	}
 
-	private void OnWeaponChange(TEvent pTEvent)
+	private void OnChange(TEvent pTEvent)
 	{
-		Invalidate = false;
+		Invalidate = true;
 	}
 }

@@ -115,16 +115,28 @@ public class LevelController : TMonoInstanceLite<LevelController>
 	{
 		GameObject pEnemyObject = ObjectPoolManager.GetInstance.Get(pEnemyVO.PrefabName);
 
-		Vector3 pCircle = Random.insideUnitCircle * 10;
-		Vector3 pPosition = pCircle.normalized * (10 + pCircle.magnitude);
+		Vector3 pPosition = GetRandomPosition();
 
-		pEnemyObject.transform.position = new Vector3(pPosition.x, 0, pPosition.y);
+		while (Mathf.Abs(pPosition.x) > 100 || Mathf.Abs(pPosition.z) > 100)
+		{
+			pPosition = GetRandomPosition();
+		}
+
+		pEnemyObject.transform.position = pPosition;
 
 		EnemyUnits pEnemyUnits = pEnemyObject.GetComponent<EnemyUnits>();
 
 		pEnemyUnits.ResetUnit(pEnemyVO);
 
 		m_OnScreenEnemyCount++;
+	}
+
+	private Vector3 GetRandomPosition()
+	{
+		Vector2 pCircle = Random.insideUnitCircle * 20;
+		Vector2 pPosition = pCircle.normalized * (10 + pCircle.magnitude);
+
+		return new Vector3(pPosition.x, 0, pPosition.y) + m_CurrentPlayer.transform.position;
 	}
 
 	private void RecycleAllObjects()
@@ -154,6 +166,8 @@ public class LevelController : TMonoInstanceLite<LevelController>
 	private void RequestChangeWeapon(int nIndex)
 	{
 		Debug.Log("RequestChangeWeapon " + nIndex);
+
+		if (m_CurrentPlayer.IsReloadingWeapon) return;
 
 		if (LevelManager.GetInstance.CurrentLevelVO.UnlockedWeapon.IndexOf(nIndex) != -1)
 		{
@@ -214,6 +228,8 @@ public class LevelController : TMonoInstanceLite<LevelController>
 
 		if (m_CurrenyEnemyCount == 0)
 		{
+			m_StartCountDown = false;
+
 			LevelManager.GetInstance.LevelClear();
 		}
 	}

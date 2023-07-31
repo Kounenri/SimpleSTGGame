@@ -15,10 +15,6 @@ public class EnemyController : MonoBehaviour
 	[SerializeField]
 	private float m_GroundedOffset = -0.14f;
 	[SerializeField]
-	private float m_GroundedRadius = 0.28f;
-	[SerializeField]
-	private LayerMask m_GroundLayers;
-	[SerializeField]
 	private float m_Gravity = -15.0f;
 	[SerializeField]
 	private float m_FallTimeout = 0.15f;
@@ -35,6 +31,7 @@ public class EnemyController : MonoBehaviour
 	private EnemyUnits m_EnemyUnits;
 	private Animator m_Animator;
 	private CharacterController m_Controller;
+	private Tweener m_Tweener;
 
 	// player
 	private float m_Speed;
@@ -78,6 +75,15 @@ public class EnemyController : MonoBehaviour
 		ParticleSystem pParticleSystem = GetComponentInChildren<ParticleSystem>();
 
 		if (pParticleSystem != null) pParticleSystem.Play(true);
+	}
+
+	private void OnDisable()
+	{
+		if (m_Tweener != null)
+		{
+			m_Tweener.Kill();
+			m_Tweener = null;
+		}
 	}
 
 	private void AssignAnimationIDs()
@@ -143,9 +149,7 @@ public class EnemyController : MonoBehaviour
 
 	private void GroundedCheck()
 	{
-		// set sphere position, with offset
-		Vector3 pSpherePosition = new Vector3(transform.position.x, transform.position.y - m_GroundedOffset, transform.position.z);
-		m_Grounded = Physics.CheckSphere(pSpherePosition, m_GroundedRadius, m_GroundLayers, QueryTriggerInteraction.Ignore);
+		m_Grounded = transform.position.y - m_GroundedOffset <= 0f;
 	}
 
 	private void Move(Vector3 pTargetDirection)
@@ -223,7 +227,7 @@ public class EnemyController : MonoBehaviour
 		if (pParticleSystem != null) pParticleSystem.Stop(true);
 
 		// fade in to ground
-		transform.DOMoveY(-2f, 2f).SetDelay(5f).OnComplete(() =>
+		m_Tweener = transform.DOMoveY(-2f, 2f).SetDelay(5f).OnComplete(() =>
 		{
 			ObjectPoolManager.GetInstance.Release(gameObject);
 		});

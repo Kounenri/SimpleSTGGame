@@ -35,6 +35,8 @@ public class LevelManager : TEventDispatcher<LevelManager>, IDispatcher
 
 	public void OnLevelLoaded()
 	{
+		ChangeLevel(m_CurrentLevelVO);
+
 		LevelController.GetInstance.InitializeLevel();
 
 		m_IsRunning = true;
@@ -78,7 +80,6 @@ public class LevelManager : TEventDispatcher<LevelManager>, IDispatcher
 		m_CurrentWeaponVO = pWeapon;
 
 		DispatchEvent(ON_WEAPON_CHANGE, m_CurrentWeaponVO);
-		DispatchEvent(ON_BULLET_COUNT_CHANGE, m_CurrentWeaponVO.Capacity);
 	}
 
 	public void BulletCountChange(int nCount)

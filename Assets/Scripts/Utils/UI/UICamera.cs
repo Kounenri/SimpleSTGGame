@@ -31,7 +31,7 @@ public class UICamera : MonoBehaviour
 
 	private Camera m_UICamera;
 
-	public new Camera camera
+	public Camera Camera
 	{
 		get
 		{

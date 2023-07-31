@@ -131,7 +131,11 @@ public class MainViewUI : BaseCanvas
 		}
 
 		m_WeaponNameText.text = m_WeaponVO.Name;
-		m_WeaponStatusText.text = LevelController.GetInstance.CurrentPlayer.LeftBulletCount + "/" + m_WeaponVO.Capacity;
+
+		if (LevelController.GetInstance.CurrentPlayer != null)
+		{
+			m_WeaponStatusText.text = LevelController.GetInstance.CurrentPlayer.LeftBulletCount + "/" + m_WeaponVO.Capacity;
+		}
 	}
 
 	private void OnBulletCountChanged(TEvent pTEvent)

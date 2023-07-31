@@ -53,6 +53,11 @@ public class ResultView : BaseCanvas
 			m_Text.text = "No luck, the character dies. TAT";
 			m_Text.color = Color.red;
 
+			if (LevelManager.GetInstance.RetryCount > 0)
+			{
+				m_Text.text += "\nRetryCount (" + LevelManager.GetInstance.RetryCount + ")";
+			}
+
 			m_RestartBtn.SetActive(true);
 			m_ContinueBtn.SetActive(false);
 		}
@@ -60,6 +65,11 @@ public class ResultView : BaseCanvas
 		{
 			m_Text.text = "Countdown is over, go faster next time. TAT";
 			m_Text.color = Color.red;
+
+			if (LevelManager.GetInstance.RetryCount > 0)
+			{
+				m_Text.text += "\nRetryCount (" + LevelManager.GetInstance.RetryCount + ")";
+			}
 
 			m_RestartBtn.SetActive(true);
 			m_ContinueBtn.SetActive(false);

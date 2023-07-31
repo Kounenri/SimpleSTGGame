@@ -15,12 +15,15 @@ public class LevelManager : TEventDispatcher<LevelManager>, IDispatcher
 	private LevelVO m_CurrentLevelVO;
 	private WeaponVO m_CurrentWeaponVO;
 	private bool m_IsRunning;
+	private int m_RetryCount;
 
 	public LevelVO CurrentLevelVO { get { return m_CurrentLevelVO; } }
 
 	public WeaponVO CurrentWeaponVO { get { return m_CurrentWeaponVO; } }
 
 	public bool IsRunning { get { return m_IsRunning; } }
+
+	public int RetryCount { get { return m_RetryCount; } }
 
 	protected override void OnInitialize()
 	{
@@ -39,6 +42,8 @@ public class LevelManager : TEventDispatcher<LevelManager>, IDispatcher
 
 		LevelController.GetInstance.InitializeLevel();
 
+		m_RetryCount = 3;
+
 		m_IsRunning = true;
 	}
 
@@ -53,9 +58,16 @@ public class LevelManager : TEventDispatcher<LevelManager>, IDispatcher
 	{
 		if (!m_IsRunning)
 		{
-			ChangeWeapon(WeaponConfProxy.GetInstance.GetDataVO(GameConfig.DEFAULT_WEAPON_ID));
+			m_RetryCount--;
 
-			ChangeLevel(LevelConfProxy.GetInstance.GetDataVO(GameConfig.DEFAULT_LEVEL_ID));
+			if (m_RetryCount == 0)
+			{
+				ChangeWeapon(WeaponConfProxy.GetInstance.GetDataVO(GameConfig.DEFAULT_WEAPON_ID));
+
+				ChangeLevel(LevelConfProxy.GetInstance.GetDataVO(GameConfig.DEFAULT_LEVEL_ID));
+
+				m_RetryCount = 3;
+			}
 
 			LevelController.GetInstance.ResetLevel();
 

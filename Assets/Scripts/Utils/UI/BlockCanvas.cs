@@ -63,7 +63,7 @@ public class BlockCanvas : MonoBehaviour
 	{
 		if (m_Canvas.worldCamera == null && UICamera.HasInstance)
 		{
-			m_Canvas.worldCamera = UICamera.GetInstance.camera;
+			m_Canvas.worldCamera = UICamera.GetInstance.Camera;
 		}
 	}
 }

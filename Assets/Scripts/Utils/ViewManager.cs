@@ -67,7 +67,7 @@ public class ViewManager : TMonoEventDispatcher<ViewManager>, IDispatcher
 	{
 		if (UICamera.HasInstance)
 		{
-			SetCamera(pCanvas, UICamera.GetInstance.camera);
+			SetCamera(pCanvas, UICamera.GetInstance.Camera);
 
 			if (HasInstance)
 			{

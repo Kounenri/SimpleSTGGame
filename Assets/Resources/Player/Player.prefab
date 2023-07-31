@@ -2458,7 +2458,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3329691155167204968
 Transform:
   m_ObjectHideFlags: 0
@@ -2541,8 +2541,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfb4d521ff3763647b55b39321cd6156, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TotalHP: 100
-  m_MoveSpeed: 5
 --- !u!114 &8813512029189625393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2727,6 +2725,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 1ba739ba-0236-4358-acd3-ef0fbe93e959
     m_ActionName: Player/Jump[/Keyboard/space]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 27e691c6-aa63-419c-8eb5-a1549714a351
+    m_ActionName: Weapon/1[/Keyboard/1]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 9c03ceed-4478-4df8-b4fa-cd1fd227d6e4
+    m_ActionName: Weapon/2[/Keyboard/2]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 0c7f336b-cdef-4a93-af60-6d38f831c5d4
+    m_ActionName: Weapon/3[/Keyboard/3]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 28a02aaf-856e-4578-b246-21c826b1a7e8
+    m_ActionName: Weapon/4[/Keyboard/4]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
